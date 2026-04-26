@@ -102,7 +102,7 @@ const Dashboard = () => {
       <div className="container py-8 grid lg:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar */}
         <aside className="space-y-4 self-start lg:sticky lg:top-20">
-          <div className="rounded-lg bg-surface border border-border p-3">
+          <div className="panel p-4">
             <div className="flex items-center gap-3">
               <AgentAvatar name={displayName} size="md" />
               <div className="min-w-0">
@@ -112,21 +112,26 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-5 p-4 rounded-lg bg-warning/10 border border-warning/30 text-center">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Lightning balance</div>
-              <Sats amount={balance} size="xl" />
-              <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => setTopupOpen(true)}>
+            <div className="mt-5 p-4 rounded-xl border border-border bg-gradient-to-b from-surface to-surface/70 text-center">
+              <div className="inline-flex items-center justify-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-success pulse-dot text-success" />
+                Lightning balance
+              </div>
+              <div className="mt-1">
+                <Sats amount={balance} size="xl" />
+              </div>
+              <Button variant="outline" size="sm" className="mt-3 w-full motion-lift" onClick={() => setTopupOpen(true)}>
                 Top Up
               </Button>
             </div>
           </div>
-          <nav className="rounded-lg bg-surface border border-border p-2 text-sm">
+          <nav className="panel p-2 text-sm">
             {VIEWS.map(v => (
               <button
                 key={v.key}
                 onClick={() => setView(v.key)}
-                className={cn('w-full text-left px-3 py-2 rounded-md transition',
-                  view === v.key ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-surface-2')}
+                className={cn('w-full text-left px-3 py-2 rounded-md transition motion-lift',
+                  view === v.key ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-surface-2/60')}
               >
                 {v.label}
               </button>
@@ -146,14 +151,17 @@ const Dashboard = () => {
           {/* OVERVIEW */}
           {view === 'overview' && (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border">
                 {([
                   ['Active Sessions', activeCount, ''],
                   ['Tasks This Month', user.tasksThisMonth, ''],
                   ['Total Spent', totalSpent, ' sats'],
                   ['Avg / Task', pick(108, 0), ' sats'],
-                ] as [string, number, string][]).map(([l, v, sfx]) => (
-                  <div key={l} className="bg-surface px-3 py-3">
+                ] as [string, number, string][]).map(([l, v, sfx], i) => (
+                  <div
+                    key={l}
+                    className={cn('bg-surface px-3 py-3 motion-fade-up', `motion-delay-${i + 1}`)}
+                  >
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
                     <div className="text-lg font-bold font-mono tabular-nums mt-1">
                       <StatCounter value={v} suffix={sfx} />
@@ -170,10 +178,10 @@ const Dashboard = () => {
 
               <RecentTasks tasks={tasks} statusStyle={statusStyle} isLive={isLive} />
 
-              <div className="rounded-lg bg-surface border border-border p-3">
+              <div className="panel p-4">
                 <h2 className="font-semibold mb-4">Spend (last 7 days)</h2>
                 {isLive ? (
-                  <div className="h-32 grid place-items-center text-xs text-muted-foreground border border-dashed border-border rounded-lg">
+                  <div className="h-32 grid place-items-center text-xs text-muted-foreground border border-dashed border-border rounded-xl">
                     No spend data — backend not connected.
                   </div>
                 ) : (
@@ -198,7 +206,7 @@ const Dashboard = () => {
 
           {view === 'favorites' && (
             favorites.length === 0 ? (
-              <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground">
+              <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
                 {isLive
                   ? 'No favorites — backend not connected.'
                   : 'No favorites yet. '}
@@ -207,7 +215,7 @@ const Dashboard = () => {
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
                 {favorites.map(a => (
-                  <div key={a.id} className="p-4 rounded-lg bg-surface border border-border flex items-center gap-3">
+                  <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3 motion-lift">
                     <AgentAvatar name={a.name} size="md" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -227,7 +235,7 @@ const Dashboard = () => {
 
           {view === 'settings' && (
             <div className="space-y-4 max-w-xl">
-              <div className="rounded-lg bg-surface border border-border p-3 space-y-4">
+              <div className="panel p-4 space-y-4">
                 <h3 className="font-semibold inline-flex items-center gap-2"><SettingsIcon className="h-4 w-4" />Profile</h3>
                 <div>
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground">Display name</Label>
@@ -239,16 +247,16 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-surface border border-border p-3 space-y-3">
+              <div className="panel p-4 space-y-3">
                 <h3 className="font-semibold">Preferences</h3>
-                <label className="flex items-center justify-between p-3 rounded-lg bg-surface-2 border border-border">
+                <label className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border">
                   <div>
                     <div className="text-sm font-medium">Email notifications</div>
                     <div className="text-xs text-muted-foreground">Get notified when sessions hit their cap</div>
                   </div>
                   <Switch checked={emailNotifs} onCheckedChange={setEmailNotifs} />
                 </label>
-                <label className="flex items-center justify-between p-3 rounded-lg bg-surface-2 border border-border">
+                <label className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border">
                   <div>
                     <div className="text-sm font-medium">Auto top-up wallet</div>
                     <div className="text-xs text-muted-foreground">Refill 10k sats when balance drops below 1k</div>
@@ -257,7 +265,7 @@ const Dashboard = () => {
                 </label>
               </div>
 
-              <div className="rounded-lg bg-destructive/5 border border-destructive/30 p-3 space-y-3">
+              <div className="rounded-xl bg-destructive/5 border border-destructive/30 p-4 space-y-3">
                 <h3 className="font-semibold text-destructive inline-flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger zone</h3>
                 <p className="text-xs text-muted-foreground">Delete your account and all associated sessions.</p>
                 <Button variant="destructive" size="sm" onClick={() => toast({ title: 'Account deletion requested', description: 'Confirmation email sent (mock).' })}>
@@ -275,7 +283,7 @@ const Dashboard = () => {
 
       {/* Top Up dialog */}
       <Dialog open={topupOpen} onOpenChange={setTopupOpen}>
-        <DialogContent className="bg-surface border-border">
+        <DialogContent className="bg-surface border-border rounded-xl">
           <DialogHeader>
             <DialogTitle>Top Up Wallet</DialogTitle>
             <DialogDescription>Add sats to your Lightning balance. Mock — no real invoice generated.</DialogDescription>
@@ -288,7 +296,7 @@ const Dashboard = () => {
                 <button
                   key={v}
                   onClick={() => setTopupAmount(v)}
-                  className="flex-1 px-2 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:border-primary/40 hover:text-primary transition tabular-nums"
+                  className="flex-1 px-2 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:border-primary/40 hover:text-primary transition tabular-nums motion-lift"
                 >
                   {v.toLocaleString()}
                 </button>
@@ -322,13 +330,13 @@ function SessionsList({
         <Button asChild size="sm" variant="outline"><Link to="/browse">+ New session</Link></Button>
       </div>
       {sessions.length === 0 ? (
-        <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground">
+        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
           No active sessions. <Link to="/browse" className="text-primary hover:underline">Find an agent →</Link>
         </div>
       ) : (
         <div className={cn('space-y-3', fullWidth && 'max-w-none')}>
           {sessions.map(s => (
-            <div key={s.id} className="p-4 rounded-lg bg-surface border border-border">
+            <div key={s.id} className="p-4 rounded-xl bg-surface border border-border motion-lift">
               <div className="flex flex-wrap items-center gap-3 mb-3">
                 <AgentAvatar name={s.agentName} size="sm" />
                 <div className="flex-1 min-w-0">
@@ -379,15 +387,18 @@ function RecentTasks({ tasks, statusStyle, expanded, isLive }: {
     <div>
       <h2 className="font-semibold mb-3">{expanded ? 'All Tasks' : 'Recent Tasks'}</h2>
       {tasks.length === 0 ? (
-        <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
+        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
           {isLive
             ? 'No task history — backend not connected.'
             : 'No tasks yet.'}
         </div>
       ) : (
-        <div className="rounded-lg bg-surface border border-border overflow-hidden">
+        <div className="panel overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <thead className={cn(
+              'bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground',
+              expanded && 'sticky top-0 z-10',
+            )}>
               <tr>
                 {['Task ID', 'Agent', 'Type', 'Status', 'Cost', 'Time'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
