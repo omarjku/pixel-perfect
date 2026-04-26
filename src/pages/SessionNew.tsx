@@ -17,8 +17,10 @@ import { cn } from '@/lib/utils';
 const SessionNew = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { requireMock } = useMode();
-  const agent = MOCK_AGENTS.find(a => a.id === params.get('agent')) ?? MOCK_AGENTS[0];
+  const { requireMock, isLive } = useMode();
+  const agent = isLive
+    ? null
+    : MOCK_AGENTS.find(a => a.id === params.get('agent')) ?? MOCK_AGENTS[0];
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [sessionType, setType] = useState<'pay-per-call' | 'verified' | 'daily-pass'>('verified');
@@ -28,9 +30,16 @@ const SessionNew = () => {
   const [paid, setPaid] = useState(false);
   const [sessionId, setSessionId] = useState('');
 
-  const totalCost = sessionType === 'pay-per-call' ? agent.pricePerTask : sessionType === 'verified' ? Math.min(spendCap, callLimit * agent.pricePerTask) : 8000;
+  const totalCost = !agent
+    ? 0
+    : sessionType === 'pay-per-call'
+    ? agent.pricePerTask
+    : sessionType === 'verified'
+    ? Math.min(spendCap, callLimit * agent.pricePerTask)
+    : 8000;
 
   const goPay = () => {
+    if (!agent) return;
     if (!requireMock('Lightning payment')) return;
     setStep(3);
     setTimeout(async () => {
@@ -41,6 +50,22 @@ const SessionNew = () => {
       setStep(4);
     }, 3000);
   };
+
+  if (!agent) {
+    return (
+      <Layout>
+        <div className="container py-20 max-w-xl text-center">
+          <h1 className="text-2xl font-bold">No agent selected</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {isLive
+              ? 'Backend not connected. Switch to Mock mode in the navbar to start a session against sample agents.'
+              : 'Pick an agent from the marketplace first.'}
+          </p>
+          <Button asChild className="mt-6"><Link to="/browse">Browse agents</Link></Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
