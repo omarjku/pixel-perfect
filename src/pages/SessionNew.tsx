@@ -11,11 +11,13 @@ import { CertificationBadge } from '@/components/CertificationBadge';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { MOCK_AGENTS, createSession } from '@/lib/mockData';
 import { toast } from '@/hooks/use-toast';
+import { useMode } from '@/lib/mode';
 import { cn } from '@/lib/utils';
 
 const SessionNew = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { requireMock } = useMode();
   const agent = MOCK_AGENTS.find(a => a.id === params.get('agent')) ?? MOCK_AGENTS[0];
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -29,6 +31,7 @@ const SessionNew = () => {
   const totalCost = sessionType === 'pay-per-call' ? agent.pricePerTask : sessionType === 'verified' ? Math.min(spendCap, callLimit * agent.pricePerTask) : 8000;
 
   const goPay = () => {
+    if (!requireMock('Lightning payment')) return;
     setStep(3);
     setTimeout(async () => {
       const s = await createSession(agent.id, { type: sessionType, callLimit, spendCap });
