@@ -335,6 +335,37 @@ const AgentProfile = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={testOpen} onOpenChange={setTestOpen}>
+        <DialogContent className="bg-surface border-border">
+          <DialogHeader>
+            <DialogTitle>Send Test Request</DialogTitle>
+            <DialogDescription>
+              Free sandbox call to {agent.name}. No sats charged. Output is mocked.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Textarea
+              value={testInput}
+              onChange={e => setTestInput(e.target.value)}
+              placeholder={`Try something like: "${Object.keys(agent.inputSchema)[0]} = sample value"`}
+              rows={4}
+              className="font-mono text-xs"
+            />
+            {testOutput && (
+              <pre className="p-3 rounded-md bg-surface-2 border border-border text-xs font-mono overflow-x-auto whitespace-pre-wrap max-h-60">
+                {testOutput}
+              </pre>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTestOpen(false)}>Close</Button>
+            <Button onClick={runTest} disabled={testRunning} className="bg-gradient-primary">
+              {testRunning ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Running…</> : <><Send className="h-4 w-4 mr-1.5" />Run test</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
