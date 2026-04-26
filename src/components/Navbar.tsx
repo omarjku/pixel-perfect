@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, Menu, Zap } from 'lucide-react';
+import { Search, Menu, Zap, Command, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Sats } from '@/components/Sats';
 import { AgentAvatar } from '@/components/AgentAvatar';
@@ -16,10 +16,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ModeToggle } from '@/components/ModeToggle';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
   { to: '/browse', label: 'Browse Agents' },
+  { to: '/session/new', label: 'New Session' },
   { to: '/sell', label: 'Sell Services' },
   { to: '/dashboard', label: 'Dashboard' },
 ];
@@ -35,7 +37,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
@@ -46,14 +48,17 @@ export function Navbar() {
         </Link>
 
         {/* Compact search (desktop) */}
-        <form onSubmit={submit} className="hidden md:flex relative flex-1 max-w-md">
+        <form onSubmit={submit} className="hidden md:flex relative flex-1 max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Search agents…"
-            className="w-full h-9 pl-9 pr-3 text-sm bg-surface-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition"
+            placeholder="Search agents, tasks, skills..."
+            className="w-full h-9 pl-9 pr-20 text-sm bg-surface border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/40 transition"
           />
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+            <Command className="h-2.5 w-2.5" />K
+          </span>
         </form>
 
         <nav className="ml-auto hidden lg:flex items-center gap-1">
@@ -64,7 +69,7 @@ export function Navbar() {
               className={({ isActive }) =>
                 cn(
                   'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                  isActive ? 'text-foreground bg-surface-2' : 'text-muted-foreground hover:text-foreground hover:bg-surface-2/60',
+                  isActive ? 'text-foreground bg-surface-2' : 'text-muted-foreground hover:text-foreground hover:bg-surface-2/70',
                 )
               }
             >
@@ -73,13 +78,24 @@ export function Navbar() {
           ))}
         </nav>
 
+        <Button
+          asChild
+          size="sm"
+          className="hidden lg:inline-flex h-9 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <Link to="/browse">
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Start
+          </Link>
+        </Button>
+
         {/* Mode toggle */}
         <ModeToggle className="hidden md:inline-flex" />
 
         {/* Wallet pill */}
         <Link
           to="/dashboard"
-          className="hidden sm:inline-flex items-center gap-2 px-3 h-9 rounded-md border border-warning/30 bg-warning/10 hover:bg-warning/20 transition"
+          className="hidden sm:inline-flex items-center gap-2 px-3 h-9 rounded-md border border-border bg-surface hover:bg-surface-2 transition"
           aria-label="Wallet balance"
         >
           <Sats amount={MOCK_USER.walletBalance} size="md" />
@@ -117,7 +133,7 @@ export function Navbar() {
         {/* Mobile */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <button className="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-md border border-border hover:bg-surface-2" aria-label="Open menu">
+            <button className="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-md border border-border bg-surface hover:bg-surface-2" aria-label="Open menu">
               <Menu className="h-5 w-5" />
             </button>
           </SheetTrigger>

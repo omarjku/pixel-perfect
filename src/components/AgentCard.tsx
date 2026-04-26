@@ -16,8 +16,8 @@ export function AgentCard({ agent, className }: AgentCardProps) {
   return (
     <article
       className={cn(
-        'group relative flex flex-col gap-3 p-3 rounded-lg bg-surface border border-border',
-        'transition-all duration-200 hover:border-primary/50',
+        'group relative flex flex-col gap-3 p-3 rounded-xl bg-surface border border-border',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card',
         className,
       )}
     >
@@ -71,7 +71,7 @@ export function AgentCard({ agent, className }: AgentCardProps) {
           <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground">
             <Link to={`/agent/${agent.id}`}>Profile</Link>
           </Button>
-          <Button asChild size="sm" className="h-7 px-3 text-xs bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button asChild size="sm" className="h-7 px-3 text-xs bg-primary text-primary-foreground hover:bg-primary/90">
             <Link to={`/session/new?agent=${agent.id}`}>Start Session</Link>
           </Button>
         </div>

@@ -4,37 +4,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AgentMesh Design System — Bloomberg terminal × modern SaaS.
-   All colors HSL. Dark mode is the default and only mode. */
+/* AgentMesh design system.
+   Dark mode is default and tuned toward a Vercel-like shell. */
 
 @layer base {
   :root {
     /* Surfaces */
-    --background: 215 28% 7%;        /* #0D1117 deep navy */
-    --foreground: 213 27% 92%;
-    --surface: 215 21% 11%;          /* #161B22 card bg */
-    --surface-2: 215 19% 14%;        /* slightly elevated */
-    --surface-3: 215 17% 18%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 94%;
+    --surface: 0 0% 8%;
+    --surface-2: 0 0% 10%;
+    --surface-3: 0 0% 13%;
 
-    --card: 215 21% 11%;
-    --card-foreground: 213 27% 92%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 94%;
 
-    --popover: 215 21% 11%;
-    --popover-foreground: 213 27% 92%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 94%;
 
     /* Brand */
-    --primary: 212 92% 58%;          /* #2F81F7 electric blue */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 212 100% 70%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 6%;
+    --primary-glow: 205 90% 68%;
 
-    --secondary: 215 19% 16%;
-    --secondary-foreground: 213 27% 92%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 94%;
 
-    --muted: 215 19% 14%;
-    --muted-foreground: 215 14% 58%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 62%;
 
-    --accent: 215 19% 16%;
-    --accent-foreground: 213 27% 92%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 94%;
 
     /* Semantic */
     --success: 134 50% 49%;          /* #3FB950 */
@@ -50,31 +50,32 @@
     --tier-verified: 270 70% 65%;
     --tier-elite: 42 95% 58%;
 
-    --border: 215 14% 22%;           /* #30363D */
-    --input: 215 14% 22%;
-    --ring: 212 92% 58%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 100%;
 
     --radius: 0.5rem;
 
     /* Gradients */
-    --gradient-hero: radial-gradient(ellipse at top, hsl(212 92% 58% / 0.18), transparent 60%),
-                     linear-gradient(180deg, hsl(215 28% 7%), hsl(215 28% 5%));
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: radial-gradient(ellipse at 50% -5%, hsl(0 0% 100% / 0.09), transparent 55%),
+                     radial-gradient(ellipse at 20% 0%, hsl(208 90% 62% / 0.1), transparent 45%),
+                     linear-gradient(180deg, hsl(0 0% 4%), hsl(0 0% 3%));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(0 0% 92%));
     --gradient-elite: linear-gradient(135deg, hsl(42 95% 58%), hsl(28 95% 55%));
 
     /* Shadows */
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 4px 12px hsl(0 0% 0% / 0.25);
-    --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 8px 24px hsl(var(--primary) / 0.18);
+    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 12px 30px hsl(0 0% 0% / 0.35);
+    --shadow-glow: 0 0 0 1px hsl(0 0% 100% / 0.22), 0 8px 28px hsl(0 0% 100% / 0.08);
 
     /* Sidebar (shadcn) */
-    --sidebar-background: 215 21% 9%;
-    --sidebar-foreground: 213 27% 88%;
-    --sidebar-primary: 212 92% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 19% 14%;
-    --sidebar-accent-foreground: 213 27% 92%;
-    --sidebar-border: 215 14% 20%;
-    --sidebar-ring: 212 92% 58%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 6%;
+    --sidebar-accent: 0 0% 11%;
+    --sidebar-accent-foreground: 0 0% 94%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   /* Force dark by default */
@@ -112,6 +113,14 @@
   .bg-gradient-primary { background: var(--gradient-primary); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
+  .panel {
+    background-color: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+  }
+  .top-fade {
+    background: linear-gradient(to bottom, hsl(var(--background)), transparent);
+  }
 
   .pulse-dot {
     position: relative;
@@ -148,4 +157,22 @@
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out both;
+}
+
+.glow-search-wrap {
+  background:
+    linear-gradient(
+      120deg,
+      hsl(var(--primary) / 0.5),
+      hsl(var(--primary-glow) / 0.8),
+      hsl(var(--primary) / 0.5)
+    );
+  background-size: 220% 220%;
+  animation: glow-slide 3.2s linear infinite;
+}
+
+@keyframes glow-slide {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

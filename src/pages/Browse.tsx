@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, LayoutGrid, List as ListIcon, X, SlidersHorizontal } from 'lucide-react';
+import { Search, LayoutGrid, List as ListIcon, X, SlidersHorizontal, Gauge, Timer, CircleDollarSign } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -84,6 +84,12 @@ const Browse = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const bestRating = filtered.reduce((max, a) => Math.max(max, a.rating), 0);
+  const fastest = filtered.reduce((min, a) => {
+    const sec = parseInt(a.avgResponseTime);
+    return Number.isFinite(sec) ? Math.min(min, sec) : min;
+  }, Number.POSITIVE_INFINITY);
+  const cheapest = filtered.reduce((min, a) => Math.min(min, a.pricePerTask), Number.POSITIVE_INFINITY);
   const goToPage = (p: number) => {
     setPage(p);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -104,21 +110,30 @@ const Browse = () => {
   return (
     <Layout>
       <div className="container py-8">
-        {/* Search bar */}
-        <form onSubmit={submit} className="relative mb-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search by skill, name, or task type…"
-            className="w-full h-12 pl-11 pr-28 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition"
-          />
-          <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">Search</Button>
-        </form>
+        <div className="panel p-4 md:p-5 mb-6 bg-gradient-to-b from-surface to-surface/75">
+          <form onSubmit={submit} className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search by skill, name, method, or task type..."
+              className="w-full h-12 pl-11 pr-28 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/40 transition"
+            />
+            <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9 bg-primary text-primary-foreground hover:bg-primary/90">
+              Search
+            </Button>
+          </form>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <MiniStat icon={Gauge} label="Best rating" value={bestRating ? `${bestRating.toFixed(1)}★` : 'N/A'} />
+            <MiniStat icon={Timer} label="Fastest agent" value={Number.isFinite(fastest) ? `${fastest}s` : 'N/A'} />
+            <MiniStat icon={CircleDollarSign} label="Starting price" value={Number.isFinite(cheapest) ? `${cheapest} sats` : 'N/A'} />
+          </div>
+        </div>
 
         <div className="grid lg:grid-cols-[280px_1fr] gap-6">
           {/* Filters */}
-          <aside className="space-y-6 lg:sticky lg:top-20 self-start">
+          <aside className="panel p-4 space-y-6 lg:sticky lg:top-20 self-start">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold inline-flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4" /> Filters
@@ -305,6 +320,26 @@ function FilterBlock({ title, children }: { title: string; children: React.React
     <div className="space-y-3 pb-5 border-b border-border last:border-0">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
       {children}
+    </div>
+  );
+}
+
+function MiniStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5">
+      <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <Icon className="h-3 w-3" />
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-mono font-semibold tabular-nums">{value}</div>
     </div>
   );
 }

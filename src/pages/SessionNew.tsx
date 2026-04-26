@@ -27,6 +27,8 @@ const SessionNew = () => {
   const [callLimit, setCallLimit] = useState(100);
   const [spendCap, setSpendCap] = useState(5000);
   const [autoRenew, setAutoRenew] = useState(false);
+  const [limitScope, setLimitScope] = useState<'session' | 'bot' | 'call' | 'day'>('session');
+  const [policyTarget, setPolicyTarget] = useState<'user' | 'agent'>('user');
   const [paid, setPaid] = useState(false);
   const [sessionId, setSessionId] = useState('');
 
@@ -85,7 +87,7 @@ const SessionNew = () => {
           </span>
         </div>
 
-        <div className="rounded-lg bg-surface border border-border p-6">
+        <div className="rounded-xl bg-surface border border-border p-6 shadow-card">
           {/* Agent header */}
           <div className="flex items-center gap-3 pb-5 mb-5 border-b border-border">
             <AgentAvatar name={agent.name} size="md" />
@@ -125,6 +127,40 @@ const SessionNew = () => {
               <h3 className="font-semibold">Configure limits</h3>
               {sessionType === 'verified' && (
                 <>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-border bg-surface-2 p-3">
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground">Limit scope</Label>
+                      <RadioGroup value={limitScope} onValueChange={(v) => setLimitScope(v as typeof limitScope)} className="mt-3 space-y-2">
+                        {([
+                          ['session', 'Per session'],
+                          ['bot', 'Per bot'],
+                          ['call', 'Per call'],
+                          ['day', 'Per day'],
+                        ] as const).map(([v, l]) => (
+                          <label key={v} className="flex items-center gap-2 cursor-pointer">
+                            <RadioGroupItem value={v} id={`scope-${v}`} />
+                            <span className="text-sm">{l}</span>
+                          </label>
+                        ))}
+                      </RadioGroup>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-surface-2 p-3">
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground">Policy target</Label>
+                      <RadioGroup value={policyTarget} onValueChange={(v) => setPolicyTarget(v as typeof policyTarget)} className="mt-3 space-y-2">
+                        {([
+                          ['user', 'User-specific'],
+                          ['agent', 'Agent-specific'],
+                        ] as const).map(([v, l]) => (
+                          <label key={v} className="flex items-center gap-2 cursor-pointer">
+                            <RadioGroupItem value={v} id={`target-${v}`} />
+                            <span className="text-sm">{l}</span>
+                          </label>
+                        ))}
+                      </RadioGroup>
+                    </div>
+                  </div>
+
                   <div>
                     <Label className="text-xs uppercase tracking-wider text-muted-foreground">Call limit</Label>
                     <input type="number" value={callLimit} onChange={e => setCallLimit(+e.target.value)}
@@ -142,6 +178,13 @@ const SessionNew = () => {
                     </div>
                     <Switch checked={autoRenew} onCheckedChange={setAutoRenew} />
                   </label>
+
+                  <div className="rounded-lg border border-primary/25 bg-primary/5 p-3">
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">Policy preview</div>
+                    <p className="mt-1 text-sm">
+                      This verified session enforces a <span className="font-semibold">{limitScope}</span>-scoped cap and applies limits at the <span className="font-semibold">{policyTarget}</span> level.
+                    </p>
+                  </div>
                 </>
               )}
               {sessionType !== 'verified' && (

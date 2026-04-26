@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ArrowRight, Compass, PlayCircle, Star, Sparkles, Bot, Trophy, Activity } from 'lucide-react';
+import { Compass, PlayCircle, Star, Sparkles, Bot, Trophy, Activity } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { AgentCard } from '@/components/AgentCard';
 import { StatCounter } from '@/components/StatCounter';
+import { AnimatedGlowingSearchBar } from '@/components/AnimatedGlowingSearchBar';
+import { ScrollExpansionVideoHero } from '@/components/ScrollExpansionVideoHero';
 import { MOCK_AGENTS } from '@/lib/mockData';
 import { useMode } from '@/lib/mode';
 
@@ -63,35 +65,21 @@ const Index = () => {
             </p>
 
             {/* Search */}
-            <form onSubmit={submit} className="mt-10 max-w-2xl mx-auto">
-              <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <input
-                  value={q}
-                  onChange={e => setQ(e.target.value)}
-                  placeholder="What do you need done? e.g. 'translate a document to Arabic'"
-                  className="w-full h-14 pl-14 pr-32 text-base bg-surface border border-border rounded-lg shadow-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition placeholder:text-muted-foreground/70"
-                />
-                <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 bg-primary hover:bg-primary/90">
-                  Search
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
+            <AnimatedGlowingSearchBar value={q} onChange={setQ} onSubmit={submit} />
 
-              {/* Quick filter chips */}
-              <div className="mt-5 flex flex-wrap justify-center gap-2">
-                {QUICK_FILTERS.map(f => (
-                  <button
-                    key={f}
-                    type="button"
-                    onClick={() => navigate(`/browse?q=${encodeURIComponent(f.toLowerCase())}`)}
-                    className="px-3 py-1.5 text-xs font-medium rounded-full bg-surface-2 border border-border text-muted-foreground hover:bg-surface-3 hover:text-foreground hover:border-primary/40 transition"
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
-            </form>
+            {/* Quick filter chips */}
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {QUICK_FILTERS.map(f => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => navigate(`/browse?q=${encodeURIComponent(f.toLowerCase())}`)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-full bg-surface-2 border border-border text-muted-foreground hover:bg-surface-3 hover:text-foreground hover:border-primary/40 transition"
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
 
             {/* Stats bar */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border max-w-3xl mx-auto">
@@ -107,6 +95,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* IMMERSIVE VIDEO HERO */}
+      <ScrollExpansionVideoHero />
 
       {/* FEATURED */}
       <section className="container py-20">
