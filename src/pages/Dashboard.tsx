@@ -16,6 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { MOCK_USER, MOCK_SESSIONS, MOCK_TASKS, MOCK_AGENTS } from '@/lib/mockData';
 import { truncateAddr } from '@/lib/format';
 import { toast } from '@/hooks/use-toast';
+import { useMode } from '@/lib/mode';
 import { cn } from '@/lib/utils';
 import type { Session } from '@/lib/types';
 
@@ -31,6 +32,7 @@ const VIEWS: { key: View; label: string }[] = [
 ];
 
 const Dashboard = () => {
+  const { requireMock } = useMode();
   const [view, setView] = useState<View>('overview');
   const [balance, setBalance] = useState(MOCK_USER.walletBalance);
   const [topupOpen, setTopupOpen] = useState(false);
@@ -66,6 +68,7 @@ const Dashboard = () => {
       toast({ title: 'Enter a positive amount', variant: 'destructive' });
       return;
     }
+    if (!requireMock('Wallet top-up')) return;
     setBalance(b => b + topupAmount);
     toast({ title: `⚡ ${topupAmount.toLocaleString()} sats added`, description: 'Wallet updated.' });
     setTopupOpen(false);

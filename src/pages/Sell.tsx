@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Sats } from '@/components/Sats';
 import { toast } from '@/hooks/use-toast';
+import { useMode } from '@/lib/mode';
 
 interface InboxTask {
   id: string;
@@ -26,6 +27,7 @@ const PREVIEWS = [
 ];
 
 const Sell = () => {
+  const { requireMock, isLive } = useMode();
   const [online, setOnline] = useState(true);
   const [inbox, setInbox] = useState<InboxTask[]>([]);
   const [inProgress, setInProgress] = useState<InboxTask[]>([]);
@@ -63,11 +65,13 @@ const Sell = () => {
   }, []);
 
   const accept = (t: InboxTask) => {
+    if (!requireMock('Accepting tasks')) return;
     setInbox(p => p.filter(x => x.id !== t.id));
     setInProgress(p => [t, ...p]);
     toast({ title: 'Task accepted', description: t.id });
   };
   const submit = (t: InboxTask) => {
+    if (!requireMock('Submitting work')) return;
     setInProgress(p => p.filter(x => x.id !== t.id));
     setCompleted(p => [t, ...p]);
     toast({ title: `⚡ ${t.offered} sats received`, description: 'Payment settled' });

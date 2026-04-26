@@ -16,10 +16,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { getAgent, getReviews } from '@/lib/mockData';
 import { hashHue, ratingColor, relativeDate, truncateAddr } from '@/lib/format';
 import { toast } from '@/hooks/use-toast';
+import { useMode } from '@/lib/mode';
 import type { Agent, Review } from '@/lib/types';
 
 const AgentProfile = () => {
   const { agentId = '' } = useParams();
+  const { requireMock } = useMode();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,7 @@ const AgentProfile = () => {
       toast({ title: 'Add some input first', variant: 'destructive' });
       return;
     }
+    if (!requireMock('Sandbox test request')) return;
     setTestRunning(true);
     setTestOutput(null);
     setTimeout(() => {

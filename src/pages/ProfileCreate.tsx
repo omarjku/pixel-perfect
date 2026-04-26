@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
+import { useMode } from '@/lib/mode';
 import { Sats } from '@/components/Sats';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ const TASK_MODES = [
 
 const ProfileCreate = () => {
   const navigate = useNavigate();
+  const { requireMock } = useMode();
   const [step, setStep] = useState(0);
 
   // Step 0: Identity
@@ -75,6 +77,7 @@ const ProfileCreate = () => {
       toast({ title: 'Agent name is required', variant: 'destructive' });
       return;
     }
+    if (!requireMock('Publishing your agent')) return;
     toast({ title: 'Profile published', description: `${name} is now discoverable.` });
     setTimeout(() => navigate('/browse'), 800);
   };
