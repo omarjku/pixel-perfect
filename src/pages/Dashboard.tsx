@@ -31,17 +31,36 @@ const VIEWS: { key: View; label: string }[] = [
   { key: 'settings', label: 'Settings' },
 ];
 
+const EMPTY_USER = {
+  pubkey: '0x0000000000000000000000000000000000000000',
+  walletBalance: 0,
+  tasksThisMonth: 0,
+  totalSpent: 0,
+};
+
 const Dashboard = () => {
-  const { requireMock } = useMode();
+  const { requireMock, isLive, pick } = useMode();
+  const user = pick(MOCK_USER, EMPTY_USER);
   const [view, setView] = useState<View>('overview');
-  const [balance, setBalance] = useState(MOCK_USER.walletBalance);
+  const [balance, setBalance] = useState(user.walletBalance);
   const [topupOpen, setTopupOpen] = useState(false);
   const [topupAmount, setTopupAmount] = useState(10000);
-  const [sessions, setSessions] = useState<SessionState[]>(MOCK_SESSIONS as SessionState[]);
-  const [favorites] = useState(() => MOCK_AGENTS.slice(0, 4));
+  const [sessions, setSessions] = useState<SessionState[]>(
+    pick(MOCK_SESSIONS as SessionState[], [] as SessionState[]),
+  );
+  const [favorites] = useState(() => pick(MOCK_AGENTS.slice(0, 4), [] as typeof MOCK_AGENTS));
+  const tasks = pick(MOCK_TASKS, [] as typeof MOCK_TASKS);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [autoTopup, setAutoTopup] = useState(false);
-  const [displayName, setDisplayName] = useState('Buyer One');
+  const [displayName, setDisplayName] = useState(pick('Buyer One', ''));
+
+  // Reset live-mode-dependent state when toggling modes
+  useEffect(() => {
+    setBalance(user.walletBalance);
+    setSessions(pick(MOCK_SESSIONS as SessionState[], [] as SessionState[]));
+    setDisplayName(pick('Buyer One', ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLive]);
 
   const statusStyle = {
     completed: 'bg-success/15 text-success border-success/30',
@@ -75,7 +94,7 @@ const Dashboard = () => {
   };
 
   const activeCount = sessions.filter(s => s.status === 'active').length;
-  const totalSpent = useMemo(() => MOCK_USER.totalSpent + sessions.reduce((acc, s) => acc + s.spendUsed, 0), [sessions]);
+  const totalSpent = useMemo(() => user.totalSpent + sessions.reduce((acc, s) => acc + s.spendUsed, 0), [sessions, user.totalSpent]);
 
   return (
     <Layout>
