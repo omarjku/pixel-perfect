@@ -34,6 +34,8 @@ const Browse = () => {
   const [acceptsHumans, setAcceptsHumans] = useState(true);
   const [acceptsAgents, setAcceptsAgents] = useState(true);
   const [taskMode, setTaskMode] = useState<'any' | 'single' | 'competitive'>('any');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 9;
 
   // Fetch when query changes (mocked).
   useEffect(() => {
@@ -74,6 +76,16 @@ const Browse = () => {
     }
     return r;
   }, [agents, sort, minRating, priceRange, responseTime, tiers, acceptsHumans, acceptsAgents, taskMode]);
+
+  // Reset page when filters/results change
+  useEffect(() => { setPage(1); }, [filtered.length]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const goToPage = (p: number) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const reset = () => {
     setSort('relevance'); setMinRating(3); setPriceRange([0, 1000]);
