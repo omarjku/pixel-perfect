@@ -27,16 +27,23 @@ const PREVIEWS = [
 ];
 
 const Sell = () => {
-  const { requireMock, isLive } = useMode();
+  const { requireMock, isLive, pick } = useMode();
   const [online, setOnline] = useState(true);
   const [inbox, setInbox] = useState<InboxTask[]>([]);
   const [inProgress, setInProgress] = useState<InboxTask[]>([]);
   const [completed, setCompleted] = useState<InboxTask[]>([]);
   const [now, setNow] = useState(Date.now());
 
+  // Reset inbox when toggling mode
+  useEffect(() => {
+    setInbox([]);
+    setInProgress([]);
+    setCompleted([]);
+  }, [isLive]);
+
   // TODO: Supabase Realtime subscription — table: task_inbox
   useEffect(() => {
-    if (!online) return;
+    if (!online || isLive) return;
     const id = setInterval(() => {
       const i = Math.floor(Math.random() * TASK_TYPES.length);
       setInbox(prev => [
@@ -53,7 +60,7 @@ const Sell = () => {
       ].slice(0, 6));
     }, 9000);
     return () => clearInterval(id);
-  }, [online]);
+  }, [online, isLive]);
 
   // Tick + expire
   useEffect(() => {
@@ -77,7 +84,14 @@ const Sell = () => {
     toast({ title: `⚡ ${t.offered} sats received`, description: 'Payment settled' });
   };
 
-  const todayEarnings = completed.reduce((s, t) => s + t.offered, 0) + 2340;
+  const baselineEarnings = pick(2340, 0);
+  const todayEarnings = completed.reduce((s, t) => s + t.offered, 0) + baselineEarnings;
+  const weekEarnings = pick(14200, 0);
+  const allTimeEarnings = pick(847500, 0);
+  const hourlyBars = pick(
+    [3, 7, 4, 9, 6, 11, 8, 12, 10, 14, 9, 13],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  );
 
   return (
     <Layout>
@@ -101,7 +115,17 @@ const Sell = () => {
 
         <div className="grid lg:grid-cols-[1fr_1fr_1fr_280px] gap-4">
           <Column title="Inbox" count={inbox.length}>
-            {inbox.length === 0 && <Empty msg={online ? 'Listening for tasks…' : 'Go online to receive tasks'} />}
+            {inbox.length === 0 && (
+              <Empty
+                msg={
+                  isLive
+                    ? 'No live tasks — backend not connected.'
+                    : online
+                    ? 'Listening for tasks…'
+                    : 'Go online to receive tasks'
+                }
+              />
+            )}
             {inbox.map(t => {
               const sec = Math.max(0, Math.floor((t.expiresAt - now) / 1000));
               return (
@@ -158,13 +182,13 @@ const Sell = () => {
           <aside className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Earnings</h3>
             <Stat label="Today" value={todayEarnings} />
-            <Stat label="This week" value={14200} />
-            <Stat label="All-time" value={847500} />
+            <Stat label="This week" value={weekEarnings} />
+            <Stat label="All-time" value={allTimeEarnings} />
             <div className="rounded-xl bg-surface border border-border p-4">
               <div className="text-xs text-muted-foreground mb-2">Hourly</div>
               <div className="flex items-end gap-1 h-12">
-                {[3, 7, 4, 9, 6, 11, 8, 12, 10, 14, 9, 13].map((v, i) => (
-                  <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-primary-glow" style={{ height: `${(v / 14) * 100}%` }} />
+                {hourlyBars.map((v, i) => (
+                  <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-primary-glow" style={{ height: `${(v / 14) * 100}%`, minHeight: v === 0 ? '2px' : undefined, opacity: v === 0 ? 0.2 : 1 }} />
                 ))}
               </div>
             </div>

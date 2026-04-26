@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Pause, Play, X, Star, Trash2, Settings as SettingsIcon } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -31,17 +31,36 @@ const VIEWS: { key: View; label: string }[] = [
   { key: 'settings', label: 'Settings' },
 ];
 
+const EMPTY_USER = {
+  pubkey: '0x0000000000000000000000000000000000000000',
+  walletBalance: 0,
+  tasksThisMonth: 0,
+  totalSpent: 0,
+};
+
 const Dashboard = () => {
-  const { requireMock } = useMode();
+  const { requireMock, isLive, pick } = useMode();
+  const user = pick(MOCK_USER, EMPTY_USER);
   const [view, setView] = useState<View>('overview');
-  const [balance, setBalance] = useState(MOCK_USER.walletBalance);
+  const [balance, setBalance] = useState(user.walletBalance);
   const [topupOpen, setTopupOpen] = useState(false);
   const [topupAmount, setTopupAmount] = useState(10000);
-  const [sessions, setSessions] = useState<SessionState[]>(MOCK_SESSIONS as SessionState[]);
-  const [favorites] = useState(() => MOCK_AGENTS.slice(0, 4));
+  const [sessions, setSessions] = useState<SessionState[]>(
+    pick(MOCK_SESSIONS as SessionState[], [] as SessionState[]),
+  );
+  const [favorites] = useState(() => pick(MOCK_AGENTS.slice(0, 4), [] as typeof MOCK_AGENTS));
+  const tasks = pick(MOCK_TASKS, [] as typeof MOCK_TASKS);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [autoTopup, setAutoTopup] = useState(false);
-  const [displayName, setDisplayName] = useState('Buyer One');
+  const [displayName, setDisplayName] = useState(pick('Buyer One', ''));
+
+  // Reset live-mode-dependent state when toggling modes
+  useEffect(() => {
+    setBalance(user.walletBalance);
+    setSessions(pick(MOCK_SESSIONS as SessionState[], [] as SessionState[]));
+    setDisplayName(pick('Buyer One', ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLive]);
 
   const statusStyle = {
     completed: 'bg-success/15 text-success border-success/30',
@@ -75,7 +94,7 @@ const Dashboard = () => {
   };
 
   const activeCount = sessions.filter(s => s.status === 'active').length;
-  const totalSpent = useMemo(() => MOCK_USER.totalSpent + sessions.reduce((acc, s) => acc + s.spendUsed, 0), [sessions]);
+  const totalSpent = useMemo(() => user.totalSpent + sessions.reduce((acc, s) => acc + s.spendUsed, 0), [sessions, user.totalSpent]);
 
   return (
     <Layout>
@@ -87,7 +106,9 @@ const Dashboard = () => {
               <AgentAvatar name={displayName} size="md" />
               <div className="min-w-0">
                 <div className="font-semibold text-sm truncate">{displayName}</div>
-                <div className="text-[11px] font-mono text-muted-foreground truncate">{truncateAddr(MOCK_USER.pubkey)}</div>
+                <div className="text-[11px] font-mono text-muted-foreground truncate">
+                  {user.pubkey === EMPTY_USER.pubkey ? 'Not signed in' : truncateAddr(user.pubkey)}
+                </div>
               </div>
             </div>
             <div className="mt-5 p-4 rounded-lg bg-warning/10 border border-warning/30 text-center">
@@ -127,9 +148,9 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border">
                 {[
                   ['Active Sessions', activeCount.toString()],
-                  ['Tasks This Month', MOCK_USER.tasksThisMonth.toString()],
+                  ['Tasks This Month', user.tasksThisMonth.toString()],
                   ['Total Spent', `${totalSpent.toLocaleString()} sats`],
-                  ['Avg / Task', '108 sats'],
+                  ['Avg / Task', pick('108 sats', '0 sats')],
                 ].map(([l, v]) => (
                   <div key={l} className="bg-surface px-5 py-4">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
@@ -144,18 +165,24 @@ const Dashboard = () => {
                 onCancel={cancelSession}
               />
 
-              <RecentTasks tasks={MOCK_TASKS} statusStyle={statusStyle} />
+              <RecentTasks tasks={tasks} statusStyle={statusStyle} isLive={isLive} />
 
               <div className="rounded-xl bg-surface border border-border p-5">
                 <h2 className="font-semibold mb-4">Spend (last 7 days)</h2>
-                <div className="flex items-end gap-3 h-32">
-                  {[120, 280, 90, 410, 180, 340, 220].map((v, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                      <div className="w-full rounded-t bg-gradient-to-t from-primary to-primary-glow shadow-glow" style={{ height: `${(v / 410) * 100}%` }} />
-                      <span className="text-[10px] font-mono text-muted-foreground">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
-                    </div>
-                  ))}
-                </div>
+                {isLive ? (
+                  <div className="h-32 grid place-items-center text-xs text-muted-foreground border border-dashed border-border rounded-lg">
+                    No spend data — backend not connected.
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-3 h-32">
+                    {[120, 280, 90, 410, 180, 340, 220].map((v, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                        <div className="w-full rounded-t bg-gradient-to-t from-primary to-primary-glow shadow-glow" style={{ height: `${(v / 410) * 100}%` }} />
+                        <span className="text-[10px] font-mono text-muted-foreground">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -164,26 +191,35 @@ const Dashboard = () => {
             <SessionsList sessions={sessions} onTogglePause={togglePause} onCancel={cancelSession} fullWidth />
           )}
 
-          {view === 'history' && <RecentTasks tasks={MOCK_TASKS} statusStyle={statusStyle} expanded />}
+          {view === 'history' && <RecentTasks tasks={tasks} statusStyle={statusStyle} expanded isLive={isLive} />}
 
           {view === 'favorites' && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              {favorites.map(a => (
-                <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3">
-                  <AgentAvatar name={a.name} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Link to={`/agent/${a.id}`} className="font-semibold text-sm hover:text-primary truncate">{a.name}</Link>
-                      <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+            favorites.length === 0 ? (
+              <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
+                {isLive
+                  ? 'No favorites — backend not connected.'
+                  : 'No favorites yet. '}
+                {!isLive && <Link to="/browse" className="text-primary hover:underline">Browse agents →</Link>}
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {favorites.map(a => (
+                  <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3">
+                    <AgentAvatar name={a.name} size="md" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Link to={`/agent/${a.id}`} className="font-semibold text-sm hover:text-primary truncate">{a.name}</Link>
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{a.tagline}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{a.tagline}</p>
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={`/session/new?agent=${a.id}`}>Hire</Link>
+                    </Button>
                   </div>
-                  <Button asChild size="sm" variant="outline">
-                    <Link to={`/session/new?agent=${a.id}`}>Hire</Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )
           )}
 
           {view === 'settings' && (
@@ -196,7 +232,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground">Public key</Label>
-                  <Input value={MOCK_USER.pubkey} readOnly className="mt-2 font-mono text-xs" />
+                  <Input value={user.pubkey} readOnly className="mt-2 font-mono text-xs" />
                 </div>
               </div>
 
@@ -330,43 +366,52 @@ function SessionsList({
   );
 }
 
-function RecentTasks({ tasks, statusStyle, expanded }: {
+function RecentTasks({ tasks, statusStyle, expanded, isLive }: {
   tasks: typeof MOCK_TASKS;
   statusStyle: Record<string, string>;
   expanded?: boolean;
+  isLive?: boolean;
 }) {
   return (
     <div>
       <h2 className="font-semibold mb-3">{expanded ? 'All Tasks' : 'Recent Tasks'}</h2>
-      <div className="rounded-xl bg-surface border border-border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-            <tr>
-              {['Task ID', 'Agent', 'Type', 'Status', 'Cost', 'Time'].map(h => (
-                <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {tasks.map(t => (
-              <tr key={t.id} className="hover:bg-surface-2/50 transition">
-                <td className="px-4 py-3 font-mono text-xs">{t.id}</td>
-                <td className="px-4 py-3">
-                  <Link to={`/agent/${t.agentId}`} className="hover:text-primary">{t.agentName}</Link>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">{t.taskType}</td>
-                <td className="px-4 py-3">
-                  <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide border', statusStyle[t.status])}>
-                    {t.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3"><Sats amount={t.cost} size="sm" /></td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{t.time}</td>
+      {tasks.length === 0 ? (
+        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
+          {isLive
+            ? 'No task history — backend not connected.'
+            : 'No tasks yet.'}
+        </div>
+      ) : (
+        <div className="rounded-xl bg-surface border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                {['Task ID', 'Agent', 'Type', 'Status', 'Cost', 'Time'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {tasks.map(t => (
+                <tr key={t.id} className="hover:bg-surface-2/50 transition">
+                  <td className="px-4 py-3 font-mono text-xs">{t.id}</td>
+                  <td className="px-4 py-3">
+                    <Link to={`/agent/${t.agentId}`} className="hover:text-primary">{t.agentName}</Link>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{t.taskType}</td>
+                  <td className="px-4 py-3">
+                    <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide border', statusStyle[t.status])}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3"><Sats amount={t.cost} size="sm" /></td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{t.time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

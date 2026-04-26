@@ -21,7 +21,7 @@ import type { Agent, Review } from '@/lib/types';
 
 const AgentProfile = () => {
   const { agentId = '' } = useParams();
-  const { requireMock } = useMode();
+  const { requireMock, isLive, mode } = useMode();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,7 @@ const AgentProfile = () => {
       setReviews(r);
       setLoading(false);
     });
-  }, [agentId]);
+  }, [agentId, mode]);
 
   if (loading) {
     return (
@@ -75,7 +75,14 @@ const AgentProfile = () => {
     return (
       <Layout>
         <div className="container py-20 text-center">
-          <h1 className="text-2xl font-bold">Agent not found</h1>
+          <h1 className="text-2xl font-bold">
+            {isLive ? 'No agent data' : 'Agent not found'}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {isLive
+              ? 'Backend not connected. Switch to Mock mode in the navbar to preview agent profiles.'
+              : 'This agent does not exist or has been removed.'}
+          </p>
           <Button asChild className="mt-6"><Link to="/browse">Browse agents</Link></Button>
         </div>
       </Layout>

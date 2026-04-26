@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AgentCard } from '@/components/AgentCard';
 import { AgentListRow } from '@/components/AgentListRow';
 import { searchAgents } from '@/lib/mockData';
+import { useMode } from '@/lib/mode';
 import type { Agent, CertTier } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +22,7 @@ const ALL_TIERS: CertTier[] = ['Unverified', 'Basic', 'Verified', 'Elite'];
 const Browse = () => {
   const [params, setParams] = useSearchParams();
   const initialQ = params.get('q') ?? '';
+  const { isLive, mode } = useMode();
 
   const [query, setQuery] = useState(initialQ);
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -45,7 +47,7 @@ const Browse = () => {
       setAgents(r);
       setLoading(false);
     });
-  }, [query]);
+  }, [query, mode]);
 
   // Sync URL on submit
   const submit = (e: React.FormEvent) => {
@@ -243,8 +245,12 @@ const Browse = () => {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20 border border-dashed border-border rounded-xl bg-surface/40">
-                <p className="text-muted-foreground">No agents match your filters.</p>
-                <Button variant="link" onClick={reset}>Reset filters</Button>
+                <p className="text-muted-foreground">
+                  {isLive
+                    ? 'No agents available — backend not connected. Switch to Mock mode to browse sample agents.'
+                    : 'No agents match your filters.'}
+                </p>
+                {!isLive && <Button variant="link" onClick={reset}>Reset filters</Button>}
               </div>
             ) : view === 'grid' ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">

@@ -1,4 +1,5 @@
 import type { Agent, Review, Task, Session } from './types';
+import { getCurrentMode } from './mode';
 
 // MOCK DATASET — replace with real backend data once available.
 // Shape mirrors the planned `/api/agents` response.
@@ -426,6 +427,7 @@ const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 // TODO: Replace with real endpoint — GET /api/agents?q=:q&sort=:sort&...
 export async function searchAgents(query: string): Promise<Agent[]> {
   await delay(400 + Math.random() * 400);
+  if (getCurrentMode() === 'live') return [];
   const q = query.trim().toLowerCase();
   if (!q) return MOCK_AGENTS;
   return MOCK_AGENTS.filter(
@@ -440,12 +442,14 @@ export async function searchAgents(query: string): Promise<Agent[]> {
 // TODO: Replace with real endpoint — GET /api/agents/:id
 export async function getAgent(id: string): Promise<Agent | undefined> {
   await delay(300);
+  if (getCurrentMode() === 'live') return undefined;
   return MOCK_AGENTS.find(a => a.id === id);
 }
 
 // TODO: Replace with real endpoint — GET /api/agents/:id/reviews
 export async function getReviews(agentId: string): Promise<Review[]> {
   await delay(300);
+  if (getCurrentMode() === 'live') return [];
   return MOCK_REVIEWS.filter(r => r.agentId === agentId);
 }
 
@@ -456,8 +460,8 @@ export async function createSession(agentId: string, payload: Partial<Session>):
   return {
     id: `sess_${Math.random().toString(36).slice(2, 10)}`,
     agentId,
-    agentName: agent.name,
-    certTier: agent.certTier,
+    agentName: agent?.name ?? 'Unknown',
+    certTier: agent?.certTier ?? 'Unverified',
     type: 'verified',
     callsUsed: 0,
     callLimit: 100,

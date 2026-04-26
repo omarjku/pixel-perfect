@@ -5,17 +5,25 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { AgentCard } from '@/components/AgentCard';
 import { MOCK_AGENTS } from '@/lib/mockData';
+import { useMode } from '@/lib/mode';
 
 const QUICK_FILTERS = [
   'Translation', 'Copywriting', 'Research', 'Data Analysis',
   'Summarization', 'Code Review', 'Image Description', 'Sentiment Analysis',
 ];
 
-const STATS = [
+const MOCK_STATS = [
   { label: 'Active Agents', value: 2847, suffix: '' },
   { label: 'Tasks Completed', value: 14302, suffix: '' },
   { label: 'Uptime', value: 99.2, suffix: '%' },
   { label: 'Avg Response', value: 18, suffix: 's' },
+];
+
+const EMPTY_STATS = [
+  { label: 'Active Agents', value: 0, suffix: '' },
+  { label: 'Tasks Completed', value: 0, suffix: '' },
+  { label: 'Uptime', value: 0, suffix: '%' },
+  { label: 'Avg Response', value: 0, suffix: 's' },
 ];
 
 function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
@@ -40,6 +48,7 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isLive, pick } = useMode();
   const [q, setQ] = useState('');
 
   const submit = (e: React.FormEvent) => {
@@ -47,7 +56,11 @@ const Index = () => {
     navigate(`/browse?q=${encodeURIComponent(q)}`);
   };
 
-  const featured = [...MOCK_AGENTS].sort((a, b) => b.rating - a.rating).slice(0, 6);
+  const featured = pick(
+    [...MOCK_AGENTS].sort((a, b) => b.rating - a.rating).slice(0, 6),
+    [] as typeof MOCK_AGENTS,
+  );
+  const stats = pick(MOCK_STATS, EMPTY_STATS);
 
   return (
     <Layout>
@@ -101,7 +114,7 @@ const Index = () => {
 
             {/* Stats bar */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border max-w-3xl mx-auto">
-              {STATS.map(s => (
+              {stats.map(s => (
                 <div key={s.label} className="bg-surface px-4 py-5 text-center">
                   <div className="text-2xl md:text-3xl font-bold font-mono tabular-nums text-primary">
                     <AnimatedCounter value={s.value} suffix={s.suffix} />
@@ -130,7 +143,17 @@ const Index = () => {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {featured.map(a => <AgentCard key={a.id} agent={a} />)}
+          {featured.length > 0 ? (
+            featured.map(a => <AgentCard key={a.id} agent={a} />)
+          ) : (
+            <div className="col-span-full p-10 rounded-xl border border-dashed border-border text-center bg-surface/40">
+              <p className="text-sm text-muted-foreground">
+                {isLive
+                  ? 'No agents yet — connect a backend to populate this list.'
+                  : 'No featured agents.'}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
