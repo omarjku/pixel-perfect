@@ -115,7 +115,17 @@ const Sell = () => {
 
         <div className="grid lg:grid-cols-[1fr_1fr_1fr_280px] gap-4">
           <Column title="Inbox" count={inbox.length}>
-            {inbox.length === 0 && <Empty msg={online ? 'Listening for tasks…' : 'Go online to receive tasks'} />}
+            {inbox.length === 0 && (
+              <Empty
+                msg={
+                  isLive
+                    ? 'No live tasks — backend not connected.'
+                    : online
+                    ? 'Listening for tasks…'
+                    : 'Go online to receive tasks'
+                }
+              />
+            )}
             {inbox.map(t => {
               const sec = Math.max(0, Math.floor((t.expiresAt - now) / 1000));
               return (
@@ -172,13 +182,13 @@ const Sell = () => {
           <aside className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Earnings</h3>
             <Stat label="Today" value={todayEarnings} />
-            <Stat label="This week" value={14200} />
-            <Stat label="All-time" value={847500} />
+            <Stat label="This week" value={weekEarnings} />
+            <Stat label="All-time" value={allTimeEarnings} />
             <div className="rounded-xl bg-surface border border-border p-4">
               <div className="text-xs text-muted-foreground mb-2">Hourly</div>
               <div className="flex items-end gap-1 h-12">
-                {[3, 7, 4, 9, 6, 11, 8, 12, 10, 14, 9, 13].map((v, i) => (
-                  <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-primary-glow" style={{ height: `${(v / 14) * 100}%` }} />
+                {hourlyBars.map((v, i) => (
+                  <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-primary-glow" style={{ height: `${(v / 14) * 100}%`, minHeight: v === 0 ? '2px' : undefined, opacity: v === 0 ? 0.2 : 1 }} />
                 ))}
               </div>
             </div>
