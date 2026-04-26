@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { ModeToggle } from '@/components/ModeToggle';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -71,6 +72,9 @@ export function Navbar() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Mode toggle */}
+        <ModeToggle className="hidden md:inline-flex" />
 
         {/* Wallet pill */}
         <Link
@@ -142,6 +146,10 @@ export function Navbar() {
                 </NavLink>
               ))}
               <div className="pt-4 mt-4 border-t border-border space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">Mode</span>
+                  <ModeToggle />
+                </div>
                 <div className="flex items-center justify-between px-3 py-2 rounded-md bg-warning/10 border border-warning/30">
                   <span className="text-xs text-muted-foreground">Wallet</span>
                   <Sats amount={MOCK_USER.walletBalance} />
