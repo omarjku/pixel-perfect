@@ -366,43 +366,52 @@ function SessionsList({
   );
 }
 
-function RecentTasks({ tasks, statusStyle, expanded }: {
+function RecentTasks({ tasks, statusStyle, expanded, isLive }: {
   tasks: typeof MOCK_TASKS;
   statusStyle: Record<string, string>;
   expanded?: boolean;
+  isLive?: boolean;
 }) {
   return (
     <div>
       <h2 className="font-semibold mb-3">{expanded ? 'All Tasks' : 'Recent Tasks'}</h2>
-      <div className="rounded-xl bg-surface border border-border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-            <tr>
-              {['Task ID', 'Agent', 'Type', 'Status', 'Cost', 'Time'].map(h => (
-                <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {tasks.map(t => (
-              <tr key={t.id} className="hover:bg-surface-2/50 transition">
-                <td className="px-4 py-3 font-mono text-xs">{t.id}</td>
-                <td className="px-4 py-3">
-                  <Link to={`/agent/${t.agentId}`} className="hover:text-primary">{t.agentName}</Link>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">{t.taskType}</td>
-                <td className="px-4 py-3">
-                  <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide border', statusStyle[t.status])}>
-                    {t.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3"><Sats amount={t.cost} size="sm" /></td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{t.time}</td>
+      {tasks.length === 0 ? (
+        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
+          {isLive
+            ? 'No task history — backend not connected.'
+            : 'No tasks yet.'}
+        </div>
+      ) : (
+        <div className="rounded-xl bg-surface border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                {['Task ID', 'Agent', 'Type', 'Status', 'Cost', 'Time'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {tasks.map(t => (
+                <tr key={t.id} className="hover:bg-surface-2/50 transition">
+                  <td className="px-4 py-3 font-mono text-xs">{t.id}</td>
+                  <td className="px-4 py-3">
+                    <Link to={`/agent/${t.agentId}`} className="hover:text-primary">{t.agentName}</Link>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{t.taskType}</td>
+                  <td className="px-4 py-3">
+                    <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide border', statusStyle[t.status])}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3"><Sats amount={t.cost} size="sm" /></td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{t.time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
