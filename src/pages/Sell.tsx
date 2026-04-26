@@ -27,16 +27,23 @@ const PREVIEWS = [
 ];
 
 const Sell = () => {
-  const { requireMock, isLive } = useMode();
+  const { requireMock, isLive, isMock, pick } = useMode();
   const [online, setOnline] = useState(true);
   const [inbox, setInbox] = useState<InboxTask[]>([]);
   const [inProgress, setInProgress] = useState<InboxTask[]>([]);
   const [completed, setCompleted] = useState<InboxTask[]>([]);
   const [now, setNow] = useState(Date.now());
 
+  // Reset inbox when toggling mode
+  useEffect(() => {
+    setInbox([]);
+    setInProgress([]);
+    setCompleted([]);
+  }, [isLive]);
+
   // TODO: Supabase Realtime subscription — table: task_inbox
   useEffect(() => {
-    if (!online) return;
+    if (!online || isLive) return;
     const id = setInterval(() => {
       const i = Math.floor(Math.random() * TASK_TYPES.length);
       setInbox(prev => [
@@ -53,7 +60,7 @@ const Sell = () => {
       ].slice(0, 6));
     }, 9000);
     return () => clearInterval(id);
-  }, [online]);
+  }, [online, isLive]);
 
   // Tick + expire
   useEffect(() => {
@@ -77,7 +84,14 @@ const Sell = () => {
     toast({ title: `⚡ ${t.offered} sats received`, description: 'Payment settled' });
   };
 
-  const todayEarnings = completed.reduce((s, t) => s + t.offered, 0) + 2340;
+  const baselineEarnings = pick(2340, 0);
+  const todayEarnings = completed.reduce((s, t) => s + t.offered, 0) + baselineEarnings;
+  const weekEarnings = pick(14200, 0);
+  const allTimeEarnings = pick(847500, 0);
+  const hourlyBars = pick(
+    [3, 7, 4, 9, 6, 11, 8, 12, 10, 14, 9, 13],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  );
 
   return (
     <Layout>
