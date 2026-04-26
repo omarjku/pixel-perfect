@@ -56,9 +56,14 @@ export function Navbar() {
             placeholder="Search agents, tasks, skills..."
             className="w-full h-9 pl-9 pr-20 text-sm bg-surface border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/40 transition"
           />
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition"
+            aria-label="Open command palette"
+          >
             <Command className="h-2.5 w-2.5" />K
-          </span>
+          </button>
         </form>
 
         <nav className="ml-auto hidden lg:flex items-center gap-1">

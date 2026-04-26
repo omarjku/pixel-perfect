@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Compass, PlayCircle, Star, Sparkles, Bot, Trophy, Activity } from 'lucide-react';
+import { ArrowRight, Compass, PlayCircle, Star, Sparkles, Bot, Trophy, Activity } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { AgentCard } from '@/components/AgentCard';
 import { StatCounter } from '@/components/StatCounter';
 import { AnimatedGlowingSearchBar } from '@/components/AnimatedGlowingSearchBar';
 import { ScrollExpansionVideoHero } from '@/components/ScrollExpansionVideoHero';
+import { FeaturedAgentRail } from '@/components/FeaturedAgentRail';
 import { MOCK_AGENTS } from '@/lib/mockData';
 import { useMode } from '@/lib/mode';
 
@@ -51,7 +51,7 @@ const Index = () => {
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 grid-bg pointer-events-none opacity-60" />
         <div className="container relative py-20 md:py-28 lg:py-32">
-          <div className="max-w-4xl mx-auto text-center animate-fade-in">
+          <div className="max-w-4xl mx-auto text-center animate-fade-in motion-fade-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium mb-6">
               <Sparkles className="h-3 w-3" />
               The marketplace built for the agent economy
@@ -82,7 +82,7 @@ const Index = () => {
             </div>
 
             {/* Stats bar */}
-            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border max-w-3xl mx-auto">
+            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border max-w-3xl mx-auto motion-fade-up motion-delay-1">
               {stats.map(s => (
                 <div key={s.label} className="bg-surface px-4 py-5 text-center">
                   <div className="text-2xl md:text-3xl font-bold font-mono tabular-nums text-primary">
@@ -107,16 +107,16 @@ const Index = () => {
               <Trophy className="h-3.5 w-3.5" />
               This week
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold">Top Rated Agents</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Featured Agent Rail</h2>
           </div>
           <Link to="/browse" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
             View all
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="motion-fade-up">
           {featured.length > 0 ? (
-            featured.map(a => <AgentCard key={a.id} agent={a} />)
+            <FeaturedAgentRail agents={featured} />
           ) : (
             <div className="col-span-full p-10 rounded-lg border border-dashed border-border text-center bg-surface/40">
               <p className="text-sm text-muted-foreground">
@@ -195,7 +195,7 @@ const Index = () => {
 
 function Step({ n, icon: Icon, title, desc }: { n: number; icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="relative p-6 rounded-lg bg-surface border border-border">
+    <div className="relative p-6 rounded-lg bg-surface border border-border motion-lift motion-fade-up">
       <div className="absolute -top-3 -right-3 grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold font-mono">{n}</div>
       <Icon className="h-7 w-7 text-primary mb-4" />
       <h3 className="font-semibold text-lg">{title}</h3>
@@ -206,7 +206,7 @@ function Step({ n, icon: Icon, title, desc }: { n: number; icon: React.Component
 
 function UseCase({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
-    <div className="p-6 rounded-lg bg-surface border border-border hover:border-primary/40 transition">
+    <div className="p-6 rounded-lg bg-surface border border-border hover:border-primary/40 transition motion-lift motion-fade-up">
       <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary mb-4 text-lg">{icon}</div>
       <h3 className="font-semibold text-lg mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
