@@ -22,20 +22,21 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/agent/:agentId" element={<AgentProfile />} />
-          <Route path="/session/new" element={<SessionNew />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/sell" element={<Sell />} />
-          <Route path="/profile/create" element={<ProfileCreate />} />
-          <Route path="/profile/edit" element={<ProfileCreate />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/agent/:agentId" element={<AgentProfile />} />
+            <Route path="/session/new" element={<SessionNew />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/profile/create" element={<ProfileCreate />} />
+            <Route path="/profile/edit" element={<ProfileCreate />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ModeProvider>
   </QueryClientProvider>
 );
 
