@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { MOCK_USER, MOCK_SESSIONS, MOCK_TASKS, MOCK_AGENTS } from '@/lib/mockData';
 import { truncateAddr } from '@/lib/format';
+import { StatCounter } from '@/components/StatCounter';
 import { toast } from '@/hooks/use-toast';
 import { useMode } from '@/lib/mode';
 import { cn } from '@/lib/utils';
@@ -101,7 +102,7 @@ const Dashboard = () => {
       <div className="container py-8 grid lg:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar */}
         <aside className="space-y-4 self-start lg:sticky lg:top-20">
-          <div className="rounded-xl bg-surface border border-border p-5">
+          <div className="rounded-lg bg-surface border border-border p-3">
             <div className="flex items-center gap-3">
               <AgentAvatar name={displayName} size="md" />
               <div className="min-w-0">
@@ -119,7 +120,7 @@ const Dashboard = () => {
               </Button>
             </div>
           </div>
-          <nav className="rounded-xl bg-surface border border-border p-2 text-sm">
+          <nav className="rounded-lg bg-surface border border-border p-2 text-sm">
             {VIEWS.map(v => (
               <button
                 key={v.key}
@@ -145,16 +146,18 @@ const Dashboard = () => {
           {/* OVERVIEW */}
           {view === 'overview' && (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border">
-                {[
-                  ['Active Sessions', activeCount.toString()],
-                  ['Tasks This Month', user.tasksThisMonth.toString()],
-                  ['Total Spent', `${totalSpent.toLocaleString()} sats`],
-                  ['Avg / Task', pick('108 sats', '0 sats')],
-                ].map(([l, v]) => (
-                  <div key={l} className="bg-surface px-5 py-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border">
+                {([
+                  ['Active Sessions', activeCount, ''],
+                  ['Tasks This Month', user.tasksThisMonth, ''],
+                  ['Total Spent', totalSpent, ' sats'],
+                  ['Avg / Task', pick(108, 0), ' sats'],
+                ] as [string, number, string][]).map(([l, v, sfx]) => (
+                  <div key={l} className="bg-surface px-3 py-3">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
-                    <div className="text-xl font-bold tabular-nums mt-1">{v}</div>
+                    <div className="text-lg font-bold font-mono tabular-nums mt-1">
+                      <StatCounter value={v} suffix={sfx} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -167,7 +170,7 @@ const Dashboard = () => {
 
               <RecentTasks tasks={tasks} statusStyle={statusStyle} isLive={isLive} />
 
-              <div className="rounded-xl bg-surface border border-border p-5">
+              <div className="rounded-lg bg-surface border border-border p-3">
                 <h2 className="font-semibold mb-4">Spend (last 7 days)</h2>
                 {isLive ? (
                   <div className="h-32 grid place-items-center text-xs text-muted-foreground border border-dashed border-border rounded-lg">
@@ -177,7 +180,7 @@ const Dashboard = () => {
                   <div className="flex items-end gap-3 h-32">
                     {[120, 280, 90, 410, 180, 340, 220].map((v, i) => (
                       <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                        <div className="w-full rounded-t bg-gradient-to-t from-primary to-primary-glow shadow-glow" style={{ height: `${(v / 410) * 100}%` }} />
+                        <div className="w-full rounded-t bg-primary" style={{ height: `${(v / 410) * 100}%` }} />
                         <span className="text-[10px] font-mono text-muted-foreground">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
                       </div>
                     ))}
@@ -195,7 +198,7 @@ const Dashboard = () => {
 
           {view === 'favorites' && (
             favorites.length === 0 ? (
-              <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
+              <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground">
                 {isLive
                   ? 'No favorites — backend not connected.'
                   : 'No favorites yet. '}
@@ -204,7 +207,7 @@ const Dashboard = () => {
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
                 {favorites.map(a => (
-                  <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3">
+                  <div key={a.id} className="p-4 rounded-lg bg-surface border border-border flex items-center gap-3">
                     <AgentAvatar name={a.name} size="md" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -224,7 +227,7 @@ const Dashboard = () => {
 
           {view === 'settings' && (
             <div className="space-y-4 max-w-xl">
-              <div className="rounded-xl bg-surface border border-border p-5 space-y-4">
+              <div className="rounded-lg bg-surface border border-border p-3 space-y-4">
                 <h3 className="font-semibold inline-flex items-center gap-2"><SettingsIcon className="h-4 w-4" />Profile</h3>
                 <div>
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground">Display name</Label>
@@ -236,7 +239,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="rounded-xl bg-surface border border-border p-5 space-y-3">
+              <div className="rounded-lg bg-surface border border-border p-3 space-y-3">
                 <h3 className="font-semibold">Preferences</h3>
                 <label className="flex items-center justify-between p-3 rounded-lg bg-surface-2 border border-border">
                   <div>
@@ -254,7 +257,7 @@ const Dashboard = () => {
                 </label>
               </div>
 
-              <div className="rounded-xl bg-destructive/5 border border-destructive/30 p-5 space-y-3">
+              <div className="rounded-lg bg-destructive/5 border border-destructive/30 p-3 space-y-3">
                 <h3 className="font-semibold text-destructive inline-flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger zone</h3>
                 <p className="text-xs text-muted-foreground">Delete your account and all associated sessions.</p>
                 <Button variant="destructive" size="sm" onClick={() => toast({ title: 'Account deletion requested', description: 'Confirmation email sent (mock).' })}>
@@ -263,7 +266,7 @@ const Dashboard = () => {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={() => toast({ title: 'Settings saved' })} className="bg-gradient-primary">Save changes</Button>
+                <Button onClick={() => toast({ title: 'Settings saved' })} className="bg-primary hover:bg-primary/90">Save changes</Button>
               </div>
             </div>
           )}
@@ -294,7 +297,7 @@ const Dashboard = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTopupOpen(false)}>Cancel</Button>
-            <Button onClick={confirmTopup} className="bg-gradient-primary">Confirm top-up</Button>
+            <Button onClick={confirmTopup} className="bg-primary hover:bg-primary/90">Confirm top-up</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -319,13 +322,13 @@ function SessionsList({
         <Button asChild size="sm" variant="outline"><Link to="/browse">+ New session</Link></Button>
       </div>
       {sessions.length === 0 ? (
-        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
+        <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground">
           No active sessions. <Link to="/browse" className="text-primary hover:underline">Find an agent →</Link>
         </div>
       ) : (
         <div className={cn('space-y-3', fullWidth && 'max-w-none')}>
           {sessions.map(s => (
-            <div key={s.id} className="p-4 rounded-xl bg-surface border border-border">
+            <div key={s.id} className="p-4 rounded-lg bg-surface border border-border">
               <div className="flex flex-wrap items-center gap-3 mb-3">
                 <AgentAvatar name={s.agentName} size="sm" />
                 <div className="flex-1 min-w-0">
@@ -376,13 +379,13 @@ function RecentTasks({ tasks, statusStyle, expanded, isLive }: {
     <div>
       <h2 className="font-semibold mb-3">{expanded ? 'All Tasks' : 'Recent Tasks'}</h2>
       {tasks.length === 0 ? (
-        <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
+        <div className="p-10 rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground bg-surface/40">
           {isLive
             ? 'No task history — backend not connected.'
             : 'No tasks yet.'}
         </div>
       ) : (
-        <div className="rounded-xl bg-surface border border-border overflow-hidden">
+        <div className="rounded-lg bg-surface border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-surface-2 text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>

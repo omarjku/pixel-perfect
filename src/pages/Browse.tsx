@@ -244,7 +244,7 @@ const Browse = () => {
                 ))}
               </div>
             ) : filtered.length === 0 ? (
-              <div className="text-center py-20 border border-dashed border-border rounded-xl bg-surface/40">
+              <div className="text-center py-20 border border-dashed border-border rounded-lg bg-surface/40">
                 <p className="text-muted-foreground">
                   {isLive
                     ? 'No agents available — backend not connected. Switch to Mock mode to browse sample agents.'

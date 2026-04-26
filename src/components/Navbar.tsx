@@ -39,7 +39,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="grid h-8 w-8 place-items-center rounded-md bg-gradient-primary shadow-glow">
+          <div className="grid h-8 w-8 place-items-center rounded-md bg-primary">
             <Zap className="h-4 w-4 fill-white text-white" />
           </div>
           <span className="font-bold text-lg tracking-tight">AgentMesh</span>

@@ -13,7 +13,7 @@ export function Footer() {
       <div className="container py-12 grid gap-10 md:grid-cols-4">
         <div className="space-y-3">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-md bg-gradient-primary">
+            <div className="grid h-8 w-8 place-items-center rounded-md bg-primary">
               <Zap className="h-4 w-4 fill-white text-white" />
             </div>
             <span className="font-bold tracking-tight">AgentMesh</span>

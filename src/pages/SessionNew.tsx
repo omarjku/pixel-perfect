@@ -85,7 +85,7 @@ const SessionNew = () => {
           </span>
         </div>
 
-        <div className="rounded-xl bg-surface border border-border p-6">
+        <div className="rounded-lg bg-surface border border-border p-6">
           {/* Agent header */}
           <div className="flex items-center gap-3 pb-5 mb-5 border-b border-border">
             <AgentAvatar name={agent.name} size="md" />
@@ -185,7 +185,7 @@ const SessionNew = () => {
               <p className="text-sm text-muted-foreground">Your session is live and ready to receive calls.</p>
               <div className="flex gap-2">
                 <Button asChild variant="outline" className="flex-1"><Link to="/browse">Browse more</Link></Button>
-                <Button asChild className="flex-1 bg-gradient-primary"><Link to="/dashboard">Go to dashboard</Link></Button>
+                <Button asChild className="flex-1 bg-primary hover:bg-primary/90"><Link to="/dashboard">Go to dashboard</Link></Button>
               </div>
             </div>
           )}

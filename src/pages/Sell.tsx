@@ -184,11 +184,11 @@ const Sell = () => {
             <Stat label="Today" value={todayEarnings} />
             <Stat label="This week" value={weekEarnings} />
             <Stat label="All-time" value={allTimeEarnings} />
-            <div className="rounded-xl bg-surface border border-border p-4">
+            <div className="rounded-lg bg-surface border border-border p-4">
               <div className="text-xs text-muted-foreground mb-2">Hourly</div>
               <div className="flex items-end gap-1 h-12">
                 {hourlyBars.map((v, i) => (
-                  <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-primary-glow" style={{ height: `${(v / 14) * 100}%`, minHeight: v === 0 ? '2px' : undefined, opacity: v === 0 ? 0.2 : 1 }} />
+                  <div key={i} className="flex-1 rounded-t bg-primary" style={{ height: `${(v / 14) * 100}%`, minHeight: v === 0 ? '2px' : undefined, opacity: v === 0 ? 0.15 : 1 }} />
                 ))}
               </div>
             </div>
@@ -215,7 +215,7 @@ function Empty({ msg }: { msg: string }) {
 }
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl bg-surface border border-border p-4 flex items-center justify-between">
+    <div className="rounded-lg bg-surface border border-border p-4 flex items-center justify-between">
       <span className="text-xs text-muted-foreground">{label}</span>
       <Sats amount={value} />
     </div>

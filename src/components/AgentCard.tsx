@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle2, Users } from 'lucide-react';
 import { AgentAvatar } from './AgentAvatar';
 import { CertificationBadge } from './CertificationBadge';
 import { RatingStars } from './RatingStars';
@@ -7,14 +6,6 @@ import { Sats } from './Sats';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Agent } from '@/lib/types';
-
-function servesLabel(serves: Agent['serves']) {
-  const h = serves.includes('humans');
-  const a = serves.includes('agents') || serves.includes('pipelines');
-  if (h && a) return 'Humans + Agents';
-  if (h) return 'Humans Only';
-  return 'Agents Only';
-}
 
 interface AgentCardProps {
   agent: Agent;
@@ -25,84 +16,66 @@ export function AgentCard({ agent, className }: AgentCardProps) {
   return (
     <article
       className={cn(
-        'group relative flex flex-col gap-4 p-5 rounded-lg bg-surface border border-border shadow-card',
-        'transition-all duration-300 hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-glow',
+        'group relative flex flex-col gap-3 p-3 rounded-lg bg-surface border border-border',
+        'transition-all duration-200 hover:border-primary/50',
         className,
       )}
     >
       {/* Cert badge top-right */}
-      <div className="absolute top-3 right-3">
+      <div className="absolute top-2.5 right-2.5">
         <CertificationBadge tier={agent.certTier} size="sm" />
       </div>
 
       {/* Header */}
-      <div className="flex items-start gap-3 pr-20">
-        <AgentAvatar name={agent.name} size="md" />
+      <div className="flex items-center gap-2.5 pr-20">
+        <AgentAvatar name={agent.name} size="sm" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-base truncate">{agent.name}</h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="font-medium text-[15px] leading-tight truncate">{agent.name}</h3>
             {agent.isOnline && (
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-success pulse-dot text-success"
+                className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-success pulse-dot text-success"
                 aria-label="Online"
               />
             )}
           </div>
-          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{agent.tagline}</p>
+          <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">{agent.tagline}</p>
         </div>
       </div>
 
-      {/* Rating */}
-      <RatingStars rating={agent.rating} reviewCount={agent.reviewCount} size="sm" />
+      {/* Rating + meta in one compact row */}
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <RatingStars rating={agent.rating} reviewCount={agent.reviewCount} size="sm" />
+        <span className="text-border">·</span>
+        <span className="font-mono tabular-nums">{agent.tasksCompleted.toLocaleString()} tasks</span>
+        <span className="text-border">·</span>
+        <span className="font-mono tabular-nums">~{agent.avgResponseTime}</span>
+      </div>
 
-      {/* Stats grid */}
-      <dl className="grid grid-cols-3 gap-2 py-3 border-y border-border">
-        <Stat icon={<CheckCircle2 className="h-3 w-3" />} label="Tasks" value={agent.tasksCompleted.toLocaleString()} />
-        <Stat icon={<Clock className="h-3 w-3" />} label="Avg" value={`~${agent.avgResponseTime}`} />
-        <Stat icon={<Users className="h-3 w-3" />} label="Price" value={`${agent.pricePerTask}`} suffix="sats" />
-      </dl>
-
-      {/* Skill tags */}
-      <div className="flex flex-wrap gap-1.5">
+      {/* Skill chips */}
+      <div className="flex flex-wrap gap-1">
         {agent.skills.slice(0, 3).map(s => (
           <span
             key={s}
-            className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide rounded-full bg-primary/10 text-primary border border-primary/20"
+            className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded border border-border bg-surface-2 text-muted-foreground"
           >
             {s}
           </span>
         ))}
       </div>
 
-      {/* Audience */}
-      <div className="text-[11px] text-muted-foreground">
-        Accepts: <span className="text-foreground font-medium">{servesLabel(agent.serves)}</span>
-      </div>
-
-      {/* CTAs */}
-      <div className="flex gap-2 mt-auto pt-1">
-        <Button asChild variant="ghost" size="sm" className="flex-1">
-          <Link to={`/agent/${agent.id}`}>View Profile</Link>
-        </Button>
-        <Button asChild size="sm" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
-          <Link to={`/session/new?agent=${agent.id}`}>Start Session</Link>
-        </Button>
+      {/* Price + CTA */}
+      <div className="flex items-center justify-between mt-auto pt-2 border-t border-border">
+        <Sats amount={agent.pricePerTask} suffix="/task" size="sm" />
+        <div className="flex items-center gap-1.5">
+          <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground">
+            <Link to={`/agent/${agent.id}`}>Profile</Link>
+          </Button>
+          <Button asChild size="sm" className="h-7 px-3 text-xs bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Link to={`/session/new?agent=${agent.id}`}>Start Session</Link>
+          </Button>
+        </div>
       </div>
     </article>
-  );
-}
-
-function Stat({ icon, label, value, suffix }: { icon: React.ReactNode; label: string; value: string; suffix?: string }) {
-  return (
-    <div className="min-w-0">
-      <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className="text-sm font-semibold tabular-nums truncate">
-        {value}
-        {suffix && <span className="text-muted-foreground font-normal text-[10px] ml-1">{suffix}</span>}
-      </div>
-    </div>
   );
 }

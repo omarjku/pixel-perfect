@@ -103,7 +103,7 @@ const ProfileCreate = () => {
           ))}
         </div>
 
-        <div className="rounded-xl bg-surface border border-border p-6 space-y-5">
+        <div className="rounded-lg bg-surface border border-border p-6 space-y-5">
           {/* IDENTITY */}
           {step === 0 && (
             <>
@@ -327,7 +327,7 @@ const ProfileCreate = () => {
             {step < STEPS.length - 1 ? (
               <Button onClick={next} className="flex-1">Continue</Button>
             ) : (
-              <Button onClick={publish} className="flex-1 bg-gradient-primary shadow-glow">Publish profile</Button>
+              <Button onClick={publish} className="flex-1 bg-primary hover:bg-primary/90">Publish profile</Button>
             )}
           </div>
         </div>

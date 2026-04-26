@@ -31,13 +31,13 @@ export function AgentListRow({ agent, className }: AgentListRowProps) {
       <div className="hidden md:block w-28">
         <RatingStars rating={agent.rating} size="sm" reviewCount={agent.reviewCount} />
       </div>
-      <div className="hidden lg:block w-20 text-sm font-mono text-center">
-        <div className="text-xs text-muted-foreground">tasks</div>
-        <div className="font-semibold tabular-nums">{(agent.tasksCompleted / 1000).toFixed(1)}k</div>
+      <div className="hidden lg:block w-20 text-center">
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">tasks</div>
+        <div className="text-sm font-mono font-semibold tabular-nums">{(agent.tasksCompleted / 1000).toFixed(1)}k</div>
       </div>
       <div className="hidden lg:block w-16 text-center">
-        <div className="text-xs text-muted-foreground">avg</div>
-        <div className="text-sm font-semibold">~{agent.avgResponseTime}</div>
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">avg</div>
+        <div className="text-sm font-mono tabular-nums">~{agent.avgResponseTime}</div>
       </div>
       <div className="hidden sm:block w-24 text-right">
         <Sats amount={agent.pricePerTask} suffix="/task" />

@@ -65,8 +65,8 @@ const AgentProfile = () => {
     return (
       <Layout>
         <div className="container py-8 space-y-6">
-          <Skeleton className="h-64 rounded-xl" />
-          <Skeleton className="h-96 rounded-xl" />
+          <Skeleton className="h-64 rounded-lg" />
+          <Skeleton className="h-96 rounded-lg" />
         </div>
       </Layout>
     );
@@ -121,7 +121,7 @@ const AgentProfile = () => {
 
       <div className="container -mt-16 md:-mt-20 relative z-10 pb-20">
         {/* Header card */}
-        <div className="rounded-xl bg-surface border border-border shadow-card p-6 md:p-8">
+        <div className="rounded-lg bg-surface border border-border p-4 md:p-5">
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <AgentAvatar name={agent.name} size="xl" className="ring-4 ring-background" />
             <div className="flex-1 min-w-0">
@@ -141,7 +141,7 @@ const AgentProfile = () => {
               </div>
             </div>
             <div className="flex gap-2 md:flex-col lg:flex-row">
-              <Button asChild size="lg" className="bg-gradient-primary shadow-glow">
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
                 <Link to={`/session/new?agent=${agent.id}`}>
                   <Zap className="h-4 w-4 mr-1.5" /> Start Session
                 </Link>
@@ -228,7 +228,7 @@ const AgentProfile = () => {
 
             {/* Pricing sidebar */}
             <aside>
-              <div className="sticky top-20 rounded-xl bg-surface border border-border p-5">
+              <div className="sticky top-20 rounded-lg bg-surface border border-border p-3">
                 <h3 className="font-semibold mb-4">Pricing</h3>
                 <div className="space-y-3">
                   {agent.pricing.map(p => (
@@ -241,7 +241,7 @@ const AgentProfile = () => {
                     </div>
                   ))}
                 </div>
-                <Button asChild className="w-full mt-4 bg-gradient-primary shadow-glow">
+                <Button asChild className="w-full mt-4 bg-primary hover:bg-primary/90">
                   <Link to={`/session/new?agent=${agent.id}`}>Start Session</Link>
                 </Button>
               </div>
@@ -251,7 +251,7 @@ const AgentProfile = () => {
           {/* REVIEWS */}
           <TabsContent value="reviews" className="mt-6 grid lg:grid-cols-[280px_1fr] gap-6">
             <aside className="space-y-5">
-              <div className="rounded-xl bg-surface border border-border p-5">
+              <div className="rounded-lg bg-surface border border-border p-3">
                 <div className={`text-5xl font-bold tabular-nums ${ratingColor(agent.rating)}`}>{agent.rating.toFixed(1)}</div>
                 <RatingStars rating={agent.rating} size="md" showNumber={false} className="mt-2" />
                 <div className="text-xs text-muted-foreground mt-1">{agent.reviewCount.toLocaleString()} reviews</div>
@@ -287,7 +287,7 @@ const AgentProfile = () => {
                 <p className="text-sm text-muted-foreground">No reviews match this filter.</p>
               )}
               {filteredReviews.map(r => (
-                <article key={r.id} className="rounded-xl bg-surface border border-border p-5">
+                <article key={r.id} className="rounded-lg bg-surface border border-border p-3">
                   <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <AgentAvatar name={r.reviewer} size="xs" />
@@ -370,7 +370,7 @@ const AgentProfile = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTestOpen(false)}>Close</Button>
-            <Button onClick={runTest} disabled={testRunning} className="bg-gradient-primary">
+            <Button onClick={runTest} disabled={testRunning} className="bg-primary hover:bg-primary/90">
               {testRunning ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Running…</> : <><Send className="h-4 w-4 mr-1.5" />Run test</>}
             </Button>
           </DialogFooter>
@@ -382,18 +382,18 @@ const AgentProfile = () => {
 
 function QuickStat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
   return (
-    <div className="bg-surface px-4 py-4">
+    <div className="bg-surface px-3 py-3">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
         <Icon className="h-3 w-3" />{label}
       </div>
-      <div className="mt-1 text-lg font-semibold tabular-nums">{value}</div>
+      <div className="mt-1 text-base font-mono font-semibold tabular-nums">{value}</div>
     </div>
   );
 }
 
 function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl bg-surface border border-border p-5 md:p-6">
+    <section className="rounded-lg bg-surface border border-border p-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 inline-flex items-center gap-2">
         {icon}{title}
       </h3>

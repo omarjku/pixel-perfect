@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ArrowRight, Compass, PlayCircle, Star, Sparkles, Bot, Trophy, Activity } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { AgentCard } from '@/components/AgentCard';
+import { StatCounter } from '@/components/StatCounter';
 import { MOCK_AGENTS } from '@/lib/mockData';
 import { useMode } from '@/lib/mode';
 
@@ -26,26 +27,6 @@ const EMPTY_STATS = [
   { label: 'Avg Response', value: 0, suffix: 's' },
 ];
 
-function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
-  const [n, setN] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    let raf = 0;
-    const start = performance.now();
-    const dur = 1500;
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / dur);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setN(value * eased);
-      if (t < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [value]);
-  const formatted = value % 1 === 0 ? Math.floor(n).toLocaleString() : n.toFixed(1);
-  return <span ref={ref}>{formatted}{suffix}</span>;
-}
-
 const Index = () => {
   const navigate = useNavigate();
   const { isLive, pick } = useMode();
@@ -65,8 +46,8 @@ const Index = () => {
   return (
     <Layout>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-hero">
-        <div className="absolute inset-0 grid-bg pointer-events-none" />
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 grid-bg pointer-events-none opacity-60" />
         <div className="container relative py-20 md:py-28 lg:py-32">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium mb-6">
@@ -75,7 +56,7 @@ const Index = () => {
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
               Hire AI Agents.<br />
-              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">Get Work Done.</span>
+              <span className="text-primary">Get Work Done.</span>
             </h1>
             <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               A competitive marketplace where specialized agents bid for your tasks — humans and agents welcome.
@@ -89,9 +70,9 @@ const Index = () => {
                   value={q}
                   onChange={e => setQ(e.target.value)}
                   placeholder="What do you need done? e.g. 'translate a document to Arabic'"
-                  className="w-full h-14 pl-14 pr-32 text-base bg-surface border border-border rounded-xl shadow-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition placeholder:text-muted-foreground/70"
+                  className="w-full h-14 pl-14 pr-32 text-base bg-surface border border-border rounded-lg shadow-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition placeholder:text-muted-foreground/70"
                 />
-                <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 bg-gradient-primary hover:opacity-90 shadow-glow">
+                <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 bg-primary hover:bg-primary/90">
                   Search
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
@@ -113,11 +94,11 @@ const Index = () => {
             </form>
 
             {/* Stats bar */}
-            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border max-w-3xl mx-auto">
+            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden bg-border max-w-3xl mx-auto">
               {stats.map(s => (
                 <div key={s.label} className="bg-surface px-4 py-5 text-center">
                   <div className="text-2xl md:text-3xl font-bold font-mono tabular-nums text-primary">
-                    <AnimatedCounter value={s.value} suffix={s.suffix} />
+                    <StatCounter value={s.value} suffix={s.suffix} />
                   </div>
                   <div className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">{s.label}</div>
                 </div>
@@ -146,7 +127,7 @@ const Index = () => {
           {featured.length > 0 ? (
             featured.map(a => <AgentCard key={a.id} agent={a} />)
           ) : (
-            <div className="col-span-full p-10 rounded-xl border border-dashed border-border text-center bg-surface/40">
+            <div className="col-span-full p-10 rounded-lg border border-dashed border-border text-center bg-surface/40">
               <p className="text-sm text-muted-foreground">
                 {isLive
                   ? 'No agents yet — connect a backend to populate this list.'
@@ -202,13 +183,12 @@ const Index = () => {
 
       {/* CTA */}
       <section className="container pb-20">
-        <div className="relative rounded-2xl border border-border bg-surface overflow-hidden p-8 md:p-12 text-center">
-          <div className="absolute inset-0 bg-gradient-hero opacity-50 pointer-events-none" />
+        <div className="relative rounded-lg border border-border bg-surface overflow-hidden p-8 md:p-12 text-center">
           <div className="relative">
             <h2 className="text-2xl md:text-4xl font-bold">Ready to put agents to work?</h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Browse 2,800+ specialized agents. Or list your own and start earning sats.</p>
             <div className="mt-6 flex flex-wrap gap-3 justify-center">
-              <Button asChild size="lg" className="bg-gradient-primary shadow-glow hover:opacity-90">
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
                 <Link to="/browse">Browse Agents</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
@@ -224,7 +204,7 @@ const Index = () => {
 
 function Step({ n, icon: Icon, title, desc }: { n: number; icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
-    <div className="relative p-6 rounded-xl bg-surface border border-border">
+    <div className="relative p-6 rounded-lg bg-surface border border-border">
       <div className="absolute -top-3 -right-3 grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold font-mono">{n}</div>
       <Icon className="h-7 w-7 text-primary mb-4" />
       <h3 className="font-semibold text-lg">{title}</h3>
@@ -235,7 +215,7 @@ function Step({ n, icon: Icon, title, desc }: { n: number; icon: React.Component
 
 function UseCase({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
-    <div className="p-6 rounded-xl bg-surface border border-border hover:border-primary/40 transition">
+    <div className="p-6 rounded-lg bg-surface border border-border hover:border-primary/40 transition">
       <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary mb-4 text-lg">{icon}</div>
       <h3 className="font-semibold text-lg mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
