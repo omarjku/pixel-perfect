@@ -106,7 +106,9 @@ const Dashboard = () => {
               <AgentAvatar name={displayName} size="md" />
               <div className="min-w-0">
                 <div className="font-semibold text-sm truncate">{displayName}</div>
-                <div className="text-[11px] font-mono text-muted-foreground truncate">{truncateAddr(MOCK_USER.pubkey)}</div>
+                <div className="text-[11px] font-mono text-muted-foreground truncate">
+                  {user.pubkey === EMPTY_USER.pubkey ? 'Not signed in' : truncateAddr(user.pubkey)}
+                </div>
               </div>
             </div>
             <div className="mt-5 p-4 rounded-lg bg-warning/10 border border-warning/30 text-center">
@@ -146,9 +148,9 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden bg-border">
                 {[
                   ['Active Sessions', activeCount.toString()],
-                  ['Tasks This Month', MOCK_USER.tasksThisMonth.toString()],
+                  ['Tasks This Month', user.tasksThisMonth.toString()],
                   ['Total Spent', `${totalSpent.toLocaleString()} sats`],
-                  ['Avg / Task', '108 sats'],
+                  ['Avg / Task', pick('108 sats', '0 sats')],
                 ].map(([l, v]) => (
                   <div key={l} className="bg-surface px-5 py-4">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
@@ -163,18 +165,24 @@ const Dashboard = () => {
                 onCancel={cancelSession}
               />
 
-              <RecentTasks tasks={MOCK_TASKS} statusStyle={statusStyle} />
+              <RecentTasks tasks={tasks} statusStyle={statusStyle} isLive={isLive} />
 
               <div className="rounded-xl bg-surface border border-border p-5">
                 <h2 className="font-semibold mb-4">Spend (last 7 days)</h2>
-                <div className="flex items-end gap-3 h-32">
-                  {[120, 280, 90, 410, 180, 340, 220].map((v, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                      <div className="w-full rounded-t bg-gradient-to-t from-primary to-primary-glow shadow-glow" style={{ height: `${(v / 410) * 100}%` }} />
-                      <span className="text-[10px] font-mono text-muted-foreground">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
-                    </div>
-                  ))}
-                </div>
+                {isLive ? (
+                  <div className="h-32 grid place-items-center text-xs text-muted-foreground border border-dashed border-border rounded-lg">
+                    No spend data — backend not connected.
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-3 h-32">
+                    {[120, 280, 90, 410, 180, 340, 220].map((v, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                        <div className="w-full rounded-t bg-gradient-to-t from-primary to-primary-glow shadow-glow" style={{ height: `${(v / 410) * 100}%` }} />
+                        <span className="text-[10px] font-mono text-muted-foreground">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -183,26 +191,35 @@ const Dashboard = () => {
             <SessionsList sessions={sessions} onTogglePause={togglePause} onCancel={cancelSession} fullWidth />
           )}
 
-          {view === 'history' && <RecentTasks tasks={MOCK_TASKS} statusStyle={statusStyle} expanded />}
+          {view === 'history' && <RecentTasks tasks={tasks} statusStyle={statusStyle} expanded isLive={isLive} />}
 
           {view === 'favorites' && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              {favorites.map(a => (
-                <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3">
-                  <AgentAvatar name={a.name} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Link to={`/agent/${a.id}`} className="font-semibold text-sm hover:text-primary truncate">{a.name}</Link>
-                      <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+            favorites.length === 0 ? (
+              <div className="p-10 rounded-xl border border-dashed border-border text-center text-sm text-muted-foreground">
+                {isLive
+                  ? 'No favorites — backend not connected.'
+                  : 'No favorites yet. '}
+                {!isLive && <Link to="/browse" className="text-primary hover:underline">Browse agents →</Link>}
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {favorites.map(a => (
+                  <div key={a.id} className="p-4 rounded-xl bg-surface border border-border flex items-center gap-3">
+                    <AgentAvatar name={a.name} size="md" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Link to={`/agent/${a.id}`} className="font-semibold text-sm hover:text-primary truncate">{a.name}</Link>
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{a.tagline}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{a.tagline}</p>
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={`/session/new?agent=${a.id}`}>Hire</Link>
+                    </Button>
                   </div>
-                  <Button asChild size="sm" variant="outline">
-                    <Link to={`/session/new?agent=${a.id}`}>Hire</Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )
           )}
 
           {view === 'settings' && (
@@ -215,7 +232,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground">Public key</Label>
-                  <Input value={MOCK_USER.pubkey} readOnly className="mt-2 font-mono text-xs" />
+                  <Input value={user.pubkey} readOnly className="mt-2 font-mono text-xs" />
                 </div>
               </div>
 
