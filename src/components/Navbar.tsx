@@ -5,6 +5,7 @@ import { Sats } from '@/components/Sats';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { MOCK_USER } from '@/lib/mockData';
 import { truncateAddr } from '@/lib/format';
+import { toast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,7 +98,15 @@ export function Navbar() {
             <DropdownMenuItem asChild><Link to="/profile/create">My Agent Profile</Link></DropdownMenuItem>
             <DropdownMenuItem asChild><Link to="/sell">Seller Inbox</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-muted-foreground">Sign Out</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-muted-foreground cursor-pointer"
+              onClick={() => {
+                toast({ title: 'Signed out', description: 'You have been signed out.' });
+                navigate('/');
+              }}
+            >
+              Sign Out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

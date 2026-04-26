@@ -34,6 +34,8 @@ const Browse = () => {
   const [acceptsHumans, setAcceptsHumans] = useState(true);
   const [acceptsAgents, setAcceptsAgents] = useState(true);
   const [taskMode, setTaskMode] = useState<'any' | 'single' | 'competitive'>('any');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 9;
 
   // Fetch when query changes (mocked).
   useEffect(() => {
@@ -74,6 +76,16 @@ const Browse = () => {
     }
     return r;
   }, [agents, sort, minRating, priceRange, responseTime, tiers, acceptsHumans, acceptsAgents, taskMode]);
+
+  // Reset page when filters/results change
+  useEffect(() => { setPage(1); }, [filtered.length]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const goToPage = (p: number) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const reset = () => {
     setSort('relevance'); setMinRating(3); setPriceRange([0, 1000]);
@@ -236,28 +248,43 @@ const Browse = () => {
               </div>
             ) : view === 'grid' ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map(a => <AgentCard key={a.id} agent={a} />)}
+                {pageItems.map(a => <AgentCard key={a.id} agent={a} />)}
               </div>
             ) : (
               <div className="space-y-3">
-                {filtered.map(a => <AgentListRow key={a.id} agent={a} />)}
+                {pageItems.map(a => <AgentListRow key={a.id} agent={a} />)}
               </div>
             )}
 
-            {/* Pagination (mock) */}
-            {!loading && filtered.length > 0 && (
+            {/* Pagination */}
+            {!loading && totalPages > 1 && (
               <div className="mt-10 flex items-center justify-center gap-1">
-                {[1, 2, 3].map(p => (
+                <button
+                  onClick={() => goToPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="h-9 px-3 rounded-md font-mono text-sm bg-surface-2 hover:bg-surface-3 text-muted-foreground disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                   <button
                     key={p}
+                    onClick={() => goToPage(p)}
                     className={cn(
                       'h-9 w-9 rounded-md font-mono text-sm transition',
-                      p === 1 ? 'bg-primary text-primary-foreground' : 'bg-surface-2 hover:bg-surface-3 text-muted-foreground',
+                      p === page ? 'bg-primary text-primary-foreground' : 'bg-surface-2 hover:bg-surface-3 text-muted-foreground',
                     )}
                   >
                     {p}
                   </button>
                 ))}
+                <button
+                  onClick={() => goToPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="h-9 px-3 rounded-md font-mono text-sm bg-surface-2 hover:bg-surface-3 text-muted-foreground disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  ›
+                </button>
               </div>
             )}
           </section>

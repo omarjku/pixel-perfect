@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ChevronLeft, Send, Zap, Clock, CheckCircle2, TrendingUp, Calendar, Code2, ChevronDown, Wrench, Shield, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Send, Zap, Clock, CheckCircle2, TrendingUp, Calendar, Code2, ChevronDown, Wrench, Shield, AlertTriangle, Loader2 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { AgentAvatar } from '@/components/AgentAvatar';
 import { CertificationBadge } from '@/components/CertificationBadge';
@@ -11,8 +11,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { getAgent, getReviews } from '@/lib/mockData';
 import { hashHue, ratingColor, relativeDate, truncateAddr } from '@/lib/format';
+import { toast } from '@/hooks/use-toast';
 import type { Agent, Review } from '@/lib/types';
 
 const AgentProfile = () => {
@@ -21,6 +24,30 @@ const AgentProfile = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewFilter, setReviewFilter] = useState<'all' | '5' | '4' | 'low'>('all');
+  const [testOpen, setTestOpen] = useState(false);
+  const [testInput, setTestInput] = useState('');
+  const [testRunning, setTestRunning] = useState(false);
+  const [testOutput, setTestOutput] = useState<string | null>(null);
+
+  const runTest = () => {
+    if (!testInput.trim()) {
+      toast({ title: 'Add some input first', variant: 'destructive' });
+      return;
+    }
+    setTestRunning(true);
+    setTestOutput(null);
+    setTimeout(() => {
+      setTestOutput(JSON.stringify({
+        status: 'success',
+        agent: agent?.id,
+        latency_ms: Math.floor(800 + Math.random() * 1200),
+        cost_sats: agent?.pricePerTask,
+        result: `[mock output] Processed: "${testInput.slice(0, 60)}${testInput.length > 60 ? '…' : ''}"`,
+      }, null, 2));
+      setTestRunning(false);
+      toast({ title: 'Test complete', description: 'No charge — sandbox call.' });
+    }, 1500);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -109,7 +136,7 @@ const AgentProfile = () => {
                   <Zap className="h-4 w-4 mr-1.5" /> Start Session
                 </Link>
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" onClick={() => { setTestOpen(true); setTestOutput(null); }}>
                 <Send className="h-4 w-4 mr-1.5" /> Send Test Request
               </Button>
             </div>
@@ -308,6 +335,37 @@ const AgentProfile = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={testOpen} onOpenChange={setTestOpen}>
+        <DialogContent className="bg-surface border-border">
+          <DialogHeader>
+            <DialogTitle>Send Test Request</DialogTitle>
+            <DialogDescription>
+              Free sandbox call to {agent.name}. No sats charged. Output is mocked.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Textarea
+              value={testInput}
+              onChange={e => setTestInput(e.target.value)}
+              placeholder={`Try something like: "${Object.keys(agent.inputSchema)[0]} = sample value"`}
+              rows={4}
+              className="font-mono text-xs"
+            />
+            {testOutput && (
+              <pre className="p-3 rounded-md bg-surface-2 border border-border text-xs font-mono overflow-x-auto whitespace-pre-wrap max-h-60">
+                {testOutput}
+              </pre>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTestOpen(false)}>Close</Button>
+            <Button onClick={runTest} disabled={testRunning} className="bg-gradient-primary">
+              {testRunning ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Running…</> : <><Send className="h-4 w-4 mr-1.5" />Run test</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
