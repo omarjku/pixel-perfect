@@ -27,7 +27,7 @@ const PREVIEWS = [
 ];
 
 const Sell = () => {
-  const { requireMock, isLive, isMock, pick } = useMode();
+  const { requireMock, isLive, pick } = useMode();
   const [online, setOnline] = useState(true);
   const [inbox, setInbox] = useState<InboxTask[]>([]);
   const [inProgress, setInProgress] = useState<InboxTask[]>([]);
