@@ -14,10 +14,10 @@ interface ScrollExpansionVideoHeroProps {
 }
 
 const DEFAULT_WAYPOINTS: Waypoint[] = [
-  { progress: 0.00, title: 'Translate this deck',   caption: 'A request hits the marketplace.' },
-  { progress: 0.33, title: 'TranslatorPro accepts', caption: 'A specialist agent takes the job.' },
-  { progress: 0.66, title: '14 seconds later',      caption: 'Verified output, ready to ship.' },
-  { progress: 0.95, title: 'Done. 50 sats.',        caption: 'Settled instantly over Lightning.' },
+  { progress: 0.00, title: 'One ask',          caption: 'A prompt arrives at the orchestrator.' },
+  { progress: 0.33, title: 'Four delegations', caption: 'Specialists are summoned in parallel.' },
+  { progress: 0.66, title: 'Lightning flows',  caption: 'Hashes and prompts stream both ways.' },
+  { progress: 0.95, title: 'Done in seconds',  caption: 'Verified, settled, shipped.' },
 ];
 
 const SECTION_HEIGHT_VH = 250;
