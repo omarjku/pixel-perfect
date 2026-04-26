@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Pause, Play, X, Star, Trash2, Settings as SettingsIcon } from 'lucide-react';
 import { Layout } from '@/components/Layout';
