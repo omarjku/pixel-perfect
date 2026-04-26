@@ -11,15 +11,17 @@ import Dashboard from "./pages/Dashboard.tsx";
 import Sell from "./pages/Sell.tsx";
 import ProfileCreate from "./pages/ProfileCreate.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { ModeProvider } from "@/lib/mode";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <ModeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/browse" element={<Browse />} />
